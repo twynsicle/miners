@@ -41,20 +41,26 @@ export class Deck {
   }
 }
 
-export const DeckDisplay = ({ cardsRemaining }) => {
-  return (
+export const DeckDisplay = ({ cardsRemaining }) => (
+  <div style={{
+    backgroundColor: STYLES.BOARD_BG,
+    borderRadius: '10px',
+    padding: '15px',
+    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+    width: '200px'
+  }}>
+    <h3 style={{ margin: '0 0 15px 0', textAlign: 'center' }}>Deck</h3>
     <div style={{
-      position: 'fixed',
-      top: '20px',
-      right: '20px',
-      backgroundColor: 'rgba(45, 45, 45, 0.9)',
-      padding: '10px 20px',
-      borderRadius: '8px',
-      color: 'white',
-      fontWeight: 'bold',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '10px',
+      backgroundColor: 'white',
+      padding: '10px',
+      borderRadius: '5px'
     }}>
-      Cards Remaining: {cardsRemaining}
+      <span style={{ fontSize: '24px' }}>🎴</span>
+      <span>{cardsRemaining} cards remaining</span>
     </div>
-  );
-};
+  </div>
+);

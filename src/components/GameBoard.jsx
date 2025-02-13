@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import BoardCell from './BoardCell';
 import PlayerHand from './PlayerHand';
+import PlayerList from './PlayerList';
 import { STYLES } from '../constants/gameConstants';
 import * as gameUtils from '../utils/gameUtils';
 import { DeckDisplay } from './Deck';
@@ -103,39 +104,60 @@ const GameBoard = () => {
   return (
     <div className="game-container" style={{
       display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
       padding: '20px',
       minHeight: '100vh',
       backgroundColor: STYLES.GAME_BG,
-      position: 'relative'
+      position: 'relative',
+      gap: '20px'
     }}>
-      <DeckDisplay cardsRemaining={cardsRemaining} />
-      
-      <div 
-        ref={boardRef}
-        className="game-board"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: STYLES.CELL_GAP,
-          padding: '20px',
-          backgroundColor: STYLES.BOARD_BG,
-          borderRadius: '10px',
-          margin: '0 auto',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
-        }}
-      >
-        {renderBoard()}
+      {/* Main game area */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        flex: '1 1 auto',
+        alignItems: 'center',
+        gap: '20px',
+        minWidth: 0 // Prevent flex items from overflowing
+      }}>
+        <div 
+          ref={boardRef}
+          className="game-board"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: STYLES.CELL_GAP,
+            padding: '20px',
+            backgroundColor: STYLES.BOARD_BG,
+            borderRadius: '10px',
+            margin: '0 auto',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+            transform: 'scale(1.1)',
+            transformOrigin: 'top center'
+          }}
+        >
+          {renderBoard()}
+        </div>
+
+        <PlayerHand
+          cards={activePlayer.hand}
+          selectedCard={selectedCard}
+          onCardSelect={handleCardSelect}
+          onCardDragStart={handleCardDragStart}
+          playerName={activePlayer.name}
+        />
       </div>
 
-      <PlayerHand
-        cards={activePlayer.hand}
-        selectedCard={selectedCard}
-        onCardSelect={handleCardSelect}
-        onCardDragStart={handleCardDragStart}
-        playerName={activePlayer.name}
-      />
+      {/* Right sidebar */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px',
+        flex: '0 0 auto',
+        width: '220px' // Fixed width for the sidebar
+      }}>
+        <DeckDisplay cardsRemaining={cardsRemaining} />
+        <PlayerList players={players} activePlayerId={activePlayerId} />
+      </div>
 
       <button
         onClick={() => dispatch(gameActions.resetGame())}

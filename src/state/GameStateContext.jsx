@@ -11,9 +11,38 @@ const createInitialState = () => ({
   players: [
     {
       id: 1,
-      name: 'Player 1',
-      avatar: '👤',
-      hand: []
+      name: 'Thorin Goldbeard',
+      avatar: '🧔',
+      hand: [],
+      debuffs: []
+    },
+    {
+      id: 2,
+      name: 'Gimli Ironfoot',
+      avatar: '👨‍🦰',
+      hand: [],
+      debuffs: []
+    },
+    {
+      id: 3,
+      name: 'Dwalin Rockfist',
+      avatar: '🧔‍♂️',
+      hand: [],
+      debuffs: []
+    },
+    {
+      id: 4,
+      name: 'Balin Gemseeker',
+      avatar: '👳‍♂️',
+      hand: [],
+      debuffs: []
+    },
+    {
+      id: 5,
+      name: 'Bofur Pickaxe',
+      avatar: '🧔‍♀️',
+      hand: [],
+      debuffs: []
     }
   ],
   activePlayerId: 1,
@@ -27,13 +56,17 @@ const createInitialState = () => ({
 // Initialize a fresh game state
 const initializeGameState = (baseState = createInitialState()) => {
   const newDeck = new Deck();
-  const initialHand = Array(6).fill(null).map(() => newDeck.drawCard());
+  
+  // Deal initial hands to all players
+  const playerHands = baseState.players.map(() => 
+    Array(6).fill(null).map(() => newDeck.drawCard())
+  );
   
   const newState = {
     ...baseState,
-    players: baseState.players.map(player => ({
+    players: baseState.players.map((player, index) => ({
       ...player,
-      hand: player.id === 1 ? initialHand : []
+      hand: playerHands[index]
     })),
     deck: newDeck,
     cardsRemaining: newDeck.getCardsRemaining(),
@@ -97,6 +130,11 @@ function gameReducer(state, action) {
       // Draw a new card
       const newCard = state.deck.drawCard();
       
+      // Move to next player's turn
+      const currentPlayerIndex = state.players.findIndex(p => p.id === state.activePlayerId);
+      const nextPlayerIndex = (currentPlayerIndex + 1) % state.players.length;
+      const nextPlayerId = state.players[nextPlayerIndex].id;
+      
       const newState = {
         ...state,
         board: {
@@ -116,7 +154,8 @@ function gameReducer(state, action) {
         }),
         selectedCard: null,
         draggedCard: null,
-        cardsRemaining: state.deck.getCardsRemaining()
+        cardsRemaining: state.deck.getCardsRemaining(),
+        activePlayerId: nextPlayerId
       };
       
       localStorage.setItem('gameState', JSON.stringify(newState));

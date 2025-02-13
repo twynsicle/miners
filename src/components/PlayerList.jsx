@@ -1,60 +1,73 @@
 import React from 'react';
 import { STYLES } from '../constants/gameConstants';
 
-const PlayerList = ({ players, activePlayerId }) => {
-  return (
-    <div style={{
-      width: STYLES.PLAYER_LIST_WIDTH,
-      marginRight: '20px',
-      backgroundColor: '#f5f5f5',
-      borderRadius: '10px',
-      padding: '15px'
-    }}>
-      <h2 style={{ margin: '0 0 15px 0', textAlign: 'center' }}>Players</h2>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {players.map(player => (
-          <div
-            key={player.id}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              padding: '10px',
-              borderLeft: player.id === activePlayerId ? STYLES.ACTIVE_PLAYER_INDICATOR : 'none'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{
-                width: STYLES.PLAYER_AVATAR_SIZE,
-                height: STYLES.PLAYER_AVATAR_SIZE,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '24px',
-                backgroundColor: '#f0f0f0',
-                borderRadius: '50%'
-              }}>
-                {player.avatar}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 'bold' }}>{player.name}</div>
-                <div style={{ fontSize: '0.9em', color: '#666' }}>Score: {player.score}</div>
-              </div>
-            </div>
-            
-            {/* Space for future debuffs */}
-            <div style={{
-              marginTop: '8px',
-              height: STYLES.PLAYER_DEBUFF_HEIGHT,
-              backgroundColor: '#f9f9f9',
-              borderRadius: '4px'
-            }} />
-          </div>
-        ))}
+const PlayerList = ({ players, activePlayerId }) => (
+  <div style={{
+    backgroundColor: STYLES.BOARD_BG,
+    borderRadius: '10px',
+    padding: '15px',
+    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+    width: '200px'
+  }}>
+    <h3 style={{ margin: '0 0 15px 0', textAlign: 'center' }}>Players</h3>
+    {players.map(player => (
+      <div
+        key={player.id}
+        style={{
+          padding: '10px',
+          marginBottom: '8px',
+          backgroundColor: player.id === activePlayerId ? '#e3f2fd' : 'white',
+          borderRadius: '5px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '5px'
+        }}
+      >
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <span style={{ fontSize: '24px' }}>{player.avatar}</span>
+          <span style={{ flex: 1 }}>{player.name}</span>
+          {player.id === activePlayerId && (
+            <span style={{ color: '#2196f3' }}>●</span>
+          )}
+        </div>
+        
+        {/* Space for future debuffs */}
+        <div style={{
+          minHeight: '24px',
+          padding: '4px',
+          backgroundColor: 'rgba(0,0,0,0.05)',
+          borderRadius: '3px',
+          fontSize: '12px',
+          color: '#666',
+          display: 'flex',
+          gap: '4px',
+          flexWrap: 'wrap'
+        }}>
+          {(!player.debuffs || player.debuffs.length === 0) ? (
+            <span style={{ fontStyle: 'italic' }}>No debuffs</span>
+          ) : (
+            player.debuffs.map((debuff, index) => (
+              <span 
+                key={index}
+                style={{
+                  padding: '2px 6px',
+                  backgroundColor: 'rgba(255,0,0,0.1)',
+                  borderRadius: '3px',
+                  color: '#d32f2f'
+                }}
+              >
+                {debuff}
+              </span>
+            ))
+          )}
+        </div>
       </div>
-    </div>
-  );
-};
+    ))}
+  </div>
+);
 
 export default PlayerList;
