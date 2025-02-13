@@ -1,19 +1,26 @@
 /**
- * Get the image filename for a card based on its paths
- * @param {number[][]} paths - Array of path arrays
- * @param {string} [id] - Optional card ID for special cards
- * @returns {string} Image filename
+ * Gets the filename for a card's image based on its paths and type
+ * @param {Array} paths - Array of path arrays
+ * @param {string} [type] - Optional card type ('start' or 'dest')
+ * @param {number} [id] - Optional card id for destination cards
+ * @returns {string} - Filename for the card image
  */
-export function getCardImageFilename(paths, id) {
-  if (id?.startsWith('dest_')) {
-    const destNumber = id.split('_')[1];
-    return `dest${destNumber}.png`;
-  }
-  if (id === 'start') {
-    return 'start.png';
-  }
-  const pathKey = paths.map(path => path.sort().join('')).join('_');
-  return `card_${pathKey}.png`;
+export function getCardImageFilename(paths, type, id) {
+  if (!paths) return 'blank.png';
+  
+  // Handle special cards
+  if (type === 'start') return 'start.png';
+  if (type === 'dest') return `dest${id}.png`;
+  
+  // Convert paths to filename
+  const getPathKey = (paths) => {
+    // For each path array in paths, sort the numbers and join them
+    return paths.map(path => 
+      Array.isArray(path) ? [...path].sort().join('') : path
+    ).join('_');
+  };
+
+  return `card_${getPathKey(paths)}.png`;
 }
 
 /**
@@ -33,4 +40,19 @@ export function generateRandomCard() {
       ]
     ]
   };
+}
+
+/**
+ * Checks if a path pattern is valid according to the game rules
+ * @param {Array} paths - Array of path arrays to validate
+ * @returns {boolean} - Whether the path pattern is valid
+ */
+export function isValidPathPattern(paths) {
+  if (!Array.isArray(paths)) return false;
+  
+  // Each path must be an array of numbers 0-3
+  return paths.every(path => 
+    Array.isArray(path) &&
+    path.every(n => n >= 0 && n <= 3)
+  );
 }

@@ -3,60 +3,63 @@ import Card from './Card';
 import { STYLES } from '../constants/gameConstants';
 
 /**
- * @typedef {import('../utils/gameUtils').Card} Card
- */
-
-/**
  * Component for displaying and managing a player's hand of cards
  * @param {Object} props
- * @param {Card[]} props.cards - Cards in the player's hand
- * @param {number} props.selectedCardIndex - Index of the selected card
+ * @param {Object[]} props.cards - Cards in the player's hand
+ * @param {Object} props.selectedCard - The currently selected card
  * @param {function(number): void} props.onCardSelect - Handler for card selection
- * @param {function(Card): void} props.onCardDragStart - Handler for card drag start
- * @param {function(): void} props.onRefreshHand - Handler for refreshing the hand
+ * @param {function(Object): void} props.onCardDragStart - Handler for card drag start
  * @param {string} props.playerName - Name of the player
  */
-function PlayerHand({ cards, selectedCardIndex, onCardSelect, onCardDragStart, onRefreshHand, playerName }) {
+const PlayerHand = ({ cards, selectedCard, onCardSelect, onCardDragStart, playerName }) => {
   return (
-    <div>
-      <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>{playerName}'s Hand</h3>
-      <div 
-        style={{
-          display: 'flex',
-          gap: '10px',
-          justifyContent: 'center',
-          padding: '10px',
-          backgroundColor: '#f0f0f0',
-          borderRadius: '10px',
-          marginTop: '20px'
-        }}
-      >
-        {cards.map((card, index) => (
-          <div
-            key={card.id}
+    <div className="player-hand-container" style={{
+      position: 'fixed',
+      bottom: '20px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '10px'
+    }}>
+      <div className="player-name" style={{
+        color: '#fff',
+        fontSize: '1.2em',
+        textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+      }}>
+        {playerName}'s Hand
+      </div>
+      <div className="cards-container" style={{
+        display: 'flex',
+        gap: '10px',
+        padding: '10px',
+        backgroundColor: 'rgba(45, 45, 45, 0.9)',
+        borderRadius: '10px',
+        boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+      }}>
+        {cards.map((card, index) => card && (
+          <div 
+            key={`hand-${index}-${card.id || 'unknown'}`}
             draggable
             onDragStart={() => onCardDragStart(card)}
+            style={{
+              transform: card === selectedCard ? 'translateY(-10px)' : 'none',
+              transition: 'transform 0.2s ease',
+              cursor: 'pointer'
+            }}
           >
             <Card
               paths={card.paths}
-              isSelected={selectedCardIndex === index}
-              onSelect={() => onCardSelect(index)}
+              selected={card === selectedCard}
+              onClick={() => onCardSelect(index)}
+              cardId={card.id}
             />
           </div>
         ))}
       </div>
-      <button onClick={onRefreshHand}>Refresh Hand</button>
-      
-      <h2>Card Connections</h2>
-      <ul>
-        {cards.map((card) => (
-          <li key={card.id}>
-            Card {card.id}: {card.paths.map((path) => `[${path.join(', ')}]`).join(' ')}
-          </li>
-        ))}
-      </ul>
     </div>
   );
-}
+};
 
 export default PlayerHand;

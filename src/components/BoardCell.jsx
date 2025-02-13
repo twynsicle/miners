@@ -7,29 +7,29 @@ const BoardCell = ({ card, isValidPlacement, onClick }) => {
     <div
       onClick={onClick}
       style={{
-        width: STYLES.CELL_WIDTH,
-        height: STYLES.CELL_HEIGHT,
-        backgroundColor: isValidPlacement ? STYLES.COLORS.VALID_DROP : STYLES.COLORS.EMPTY_CELL,
-        border: `2px solid ${isValidPlacement ? STYLES.COLORS.VALID_DROP_BORDER : STYLES.COLORS.CELL_BORDER}`,
+        width: STYLES.CARD_WIDTH,
+        height: STYLES.CARD_HEIGHT,
+        border: isValidPlacement ? '2px dashed #4CAF50' : '2px solid #1a1a1a',
         borderRadius: STYLES.CELL_BORDER_RADIUS,
+        backgroundColor: card ? 'transparent' : '#1a1a1a',
         display: 'flex',
-        alignItems: 'center',
         justifyContent: 'center',
-        cursor: isValidPlacement ? 'pointer' : 'default'
+        alignItems: 'center',
+        cursor: isValidPlacement ? 'pointer' : 'default',
+        transition: 'border-color 0.2s ease',
+        boxSizing: 'border-box',
+        margin: 0,
+        padding: 0
       }}
     >
-      {card ? (
-        <Card {...card} />
-      ) : isValidPlacement ? (
-        <div style={{
-          color: STYLES.COLORS.VALID_DROP_TEXT,
-          fontWeight: 'bold',
-          fontSize: '14px',
-          textAlign: 'center'
-        }}>
-          Play here
-        </div>
-      ) : null}
+      {card && (
+        <Card 
+          paths={card.paths}
+          type={card.type}
+          id={card.id}
+          cardId={card.cardId}
+        />
+      )}
     </div>
   );
 };
