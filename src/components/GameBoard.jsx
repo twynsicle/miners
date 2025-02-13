@@ -5,7 +5,7 @@ import PlayerHand from './PlayerHand';
 import Card from './Card';
 import PlayerList from './PlayerList';
 import { BOARD_SIZE, SPECIAL_CARDS, STYLES, DIRECTIONS, PLAYERS } from '../constants/gameConstants';
-import { isValidDrop } from '../utils/gameUtils';
+import * as gameUtils from '../utils/gameUtils';
 import { generateRandomCard } from '../utils/cardUtils';
 import { Deck, DeckDisplay } from './Deck';
 
@@ -24,6 +24,42 @@ const GameBoard = () => {
   const [activePlayerId, setActivePlayerId] = useState(PLAYERS[0].id);
   const [draggedCard, setDraggedCard] = useState(null);
   const boardRef = useRef(null);
+
+  // Convert board object to array format for validation
+  const getBoardArray = () => {
+    const boardArray = Array(81).fill(null);
+    Object.entries(board).forEach(([pos, card]) => {
+      const [row, col] = pos.split(',').map(Number);
+      boardArray[row * 9 + col] = card;
+    });
+    return boardArray;
+  };
+
+  // Check if a position is a valid drop target for a card
+  const isValidDrop = (position, card) => {
+    if (!card) return false;
+    
+    const [row, col] = position.split(',').map(Number);
+    const boardArray = getBoardArray();
+    
+    return gameUtils.isValidDrop(boardArray, row * 9 + col, card);
+  };
+
+  // Get all valid positions for the selected card
+  const getValidPositions = (card) => {
+    if (!card) return new Set();
+    
+    const validPositions = new Set();
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
+        const position = `${row},${col}`;
+        if (isValidDrop(position, card)) {
+          validPositions.add(position);
+        }
+      }
+    }
+    return validPositions;
+  };
 
   // Initialize the game
   useEffect(() => {
@@ -78,7 +114,7 @@ const GameBoard = () => {
 
   const handleBoardClick = (row, col) => {
     const position = `${row},${col}`;
-    if ((selectedCard || draggedCard) && isValidDrop(board, position, selectedCard || draggedCard)) {
+    if ((selectedCard || draggedCard) && isValidDrop(position, selectedCard || draggedCard)) {
       // Place the card
       const newBoard = { ...board };
       const cardToPlace = selectedCard || draggedCard;
@@ -139,68 +175,69 @@ const GameBoard = () => {
 
   const activePlayer = PLAYERS.find(p => p.id === activePlayerId);
 
-  // Render the game board grid
+  // Render board grid
   const renderBoard = () => {
-    const cells = [];
+    const validPositions = getValidPositions(selectedCard || draggedCard);
+    const rows = [];
+
     for (let row = 0; row < 9; row++) {
+      const cells = [];
       for (let col = 0; col < 9; col++) {
         const position = `${row},${col}`;
-        const card = board[position];
-        const isValidPlacement = (selectedCard || draggedCard) && 
-          isValidDrop(board, position, selectedCard || draggedCard);
-
         cells.push(
           <BoardCell
             key={position}
-            card={card}
-            isValidPlacement={isValidPlacement}
+            card={board[position]}
+            isValidPlacement={validPositions.has(position)}
             onClick={() => handleBoardClick(row, col)}
           />
         );
       }
+      rows.push(
+        <div key={row} style={{ display: 'flex', gap: STYLES.CELL_GAP }}>
+          {cells}
+        </div>
+      );
     }
-    return cells;
+    return rows;
   };
 
   return (
     <div className="game-container" style={{
       display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
       padding: '20px',
-      gap: '20px'
+      minHeight: '100vh',
+      backgroundColor: STYLES.GAME_BG,
+      position: 'relative'
     }}>
-      <PlayerList 
-        players={PLAYERS}
-        activePlayerId={activePlayerId}
-      />
-
-      <div className="game-board-container">
-        <div 
-          ref={drop(boardRef)}
-          className="game-board"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(9, ${STYLES.CARD_WIDTH})`,
-            gridTemplateRows: `repeat(9, ${STYLES.CARD_HEIGHT})`,
-            gap: STYLES.CELL_GAP,
-            padding: '20px',
-            backgroundColor: STYLES.BOARD_BG,
-            borderRadius: '10px',
-            margin: '0 auto',
-            width: 'fit-content'
-          }}
-        >
-          {renderBoard()}
-        </div>
-
-        <DeckDisplay cardsRemaining={cardsRemaining} />
-        <PlayerHand
-          cards={playerHand}
-          selectedCard={selectedCard}
-          onCardSelect={handleCardClick}
-          onCardDragStart={setDraggedCard}
-          playerName={activePlayer.name}
-        />
+      <DeckDisplay cardsRemaining={cardsRemaining} />
+      
+      <div 
+        ref={drop(boardRef)}
+        className="game-board"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: STYLES.CELL_GAP,
+          padding: '20px',
+          backgroundColor: STYLES.BOARD_BG,
+          borderRadius: '10px',
+          margin: '0 auto',
+          boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+        }}
+      >
+        {renderBoard()}
       </div>
+
+      <PlayerHand
+        cards={playerHand}
+        selectedCard={selectedCard}
+        onCardSelect={handleCardClick}
+        onCardDragStart={setDraggedCard}
+        playerName={activePlayer?.name}
+      />
     </div>
   );
 };

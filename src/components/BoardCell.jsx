@@ -13,13 +13,15 @@ const BoardCell = ({ card, isValidPlacement, onClick }) => {
         borderRadius: STYLES.CELL_BORDER_RADIUS,
         backgroundColor: card ? 'transparent' : '#1a1a1a',
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         cursor: isValidPlacement ? 'pointer' : 'default',
-        transition: 'border-color 0.2s ease',
+        transition: 'all 0.2s ease',
         boxSizing: 'border-box',
         margin: 0,
-        padding: 0
+        padding: 0,
+        position: 'relative'
       }}
     >
       {card && (
@@ -29,6 +31,18 @@ const BoardCell = ({ card, isValidPlacement, onClick }) => {
           id={card.id}
           cardId={card.cardId}
         />
+      )}
+      {isValidPlacement && !card && (
+        <div style={{
+          position: 'absolute',
+          color: '#4CAF50',
+          fontWeight: 'bold',
+          fontSize: '14px',
+          textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+          pointerEvents: 'none'
+        }}>
+          Play Here
+        </div>
       )}
     </div>
   );

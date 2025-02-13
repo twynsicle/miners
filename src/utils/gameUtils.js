@@ -32,141 +32,193 @@ export const getAdjacentIndices = (index) => {
 };
 
 /**
- * Check if two cards' paths match in the given direction
- * @param {Card} card1 - First card to check
- * @param {Card} card2 - Second card to check
- * @param {number} direction - Direction from card1 to card2 (0-3)
- * @returns {boolean} True if paths match and connect
+ * Check if a card is a destination card
+ * @param {Object} card - Card to check
+ * @returns {boolean} - Whether the card is a destination
  */
-export const pathsMatch = (card1, card2, direction) => {
+const isDestinationCard = (card) => {
+  return card.type === 'dest' || 
+         (typeof card.id === 'string' && card.id.startsWith(SPECIAL_CARDS.DEST_PREFIX));
+};
+
+/**
+ * Get the opposite direction
+ * @param {number} direction - Direction to get opposite of
+ * @returns {number} - Opposite direction
+ */
+const getOppositeDirection = (direction) => {
+  switch (direction) {
+    case DIRECTIONS.TOP: return DIRECTIONS.BOTTOM;
+    case DIRECTIONS.RIGHT: return DIRECTIONS.LEFT;
+    case DIRECTIONS.BOTTOM: return DIRECTIONS.TOP;
+    case DIRECTIONS.LEFT: return DIRECTIONS.RIGHT;
+    default: return -1;
+  }
+};
+
+/**
+ * Check if two cards have paths that match (either both have paths or neither has paths)
+ * @param {Object} card1 - First card
+ * @param {Object} card2 - Second card
+ * @param {number} direction - Direction from card1 to card2
+ * @returns {boolean} - Whether the paths match
+ */
+export function pathsMatch(card1, card2, direction) {
   if (!card1 || !card2) return false;
   
   // Skip path matching for destination cards
-  if (card2.id?.startsWith(SPECIAL_CARDS.DEST_PREFIX)) return true;
+  if (isDestinationCard(card2)) {
+    return true;
+  }
   
-  const opposite = (direction + 2) % 4;
+  const oppositeDirection = getOppositeDirection(direction);
   
-  // Check if either card has a path in their respective directions
+  // Check if either card has a path in the connecting direction
   const card1HasPath = card1.paths.some(path => path.includes(direction));
-  const card2HasPath = card2.paths.some(path => path.includes(opposite));
+  const card2HasPath = card2.paths.some(path => path.includes(oppositeDirection));
   
-  // Both cards should either have paths that connect, or both should not have paths
-  return (card1HasPath && card2HasPath) || (!card1HasPath && !card2HasPath);
-};
+  // Paths match if either both have connecting paths or neither does
+  return card1HasPath === card2HasPath;
+}
 
 /**
  * Check if two cards have a connecting path between them
- * @param {Card} card1 - First card
- * @param {Card} card2 - Second card
+ * @param {Object} card1 - First card
+ * @param {Object} card2 - Second card
  * @param {number} direction - Direction from card1 to card2
- * @returns {boolean} True if the cards have connecting paths
+ * @returns {boolean} - Whether the cards have a connecting path
  */
-export const haveConnectingPath = (card1, card2, direction) => {
+export function haveConnectingPath(card1, card2, direction) {
   if (!card1 || !card2) return false;
   
-  const opposite = (direction + 2) % 4;
-  
-  // For each path in card1, check if it connects to any path in card2
-  return card1.paths.some(path1 => {
-    if (!path1.includes(direction)) return false;
-    return card2.paths.some(path2 => path2.includes(opposite) && 
-      // Ensure the paths are part of the same network
-      path1.some(dir1 => path2.some(dir2 => 
-        (dir1 + 2) % 4 === dir2 && (dir1 === direction || dir2 === opposite)
-      ))
-    );
-  });
-};
-
-/**
- * Check if a card can be placed at the given index
- * @param {Card[]} board - Current game board
- * @param {number} index - Target index for card placement
- * @param {Card} card - Card to be placed
- * @returns {boolean} True if placement is valid
- */
-export const isValidDrop = (board, index, card) => {
-  // Rule 1: Can't place on an occupied space
-  if (board[index]) return false;
-
-  // Get adjacent cards and their directions
-  const adjacentCards = [
-    { dir: DIRECTIONS.TOP, offset: -BOARD_SIZE, valid: index >= BOARD_SIZE },
-    { dir: DIRECTIONS.RIGHT, offset: 1, valid: (index % BOARD_SIZE) < (BOARD_SIZE - 1) },
-    { dir: DIRECTIONS.BOTTOM, offset: BOARD_SIZE, valid: index < (BOARD_SIZE * (BOARD_SIZE - 1)) },
-    { dir: DIRECTIONS.LEFT, offset: -1, valid: (index % BOARD_SIZE) > 0 }
-  ].map(({ dir, offset, valid }) => ({
-    card: valid ? board[index + offset] : null,
-    direction: dir
-  }));
-
-  // Rule 2: Must be adjacent to at least one existing non-destination card
-  const hasAdjacentNonDestCard = adjacentCards.some(({ card: adjCard }) => 
-    adjCard && !adjCard.id?.startsWith(SPECIAL_CARDS.DEST_PREFIX)
-  );
-  if (!hasAdjacentNonDestCard) return false;
-
-  // Rule 3: Must match paths with all adjacent cards
-  const pathsMatchWithAdjacent = adjacentCards.every(({ card: adjCard, direction }) => 
-    !adjCard || pathsMatch(card, adjCard, direction)
-  );
-  if (!pathsMatchWithAdjacent) return false;
-
-  // Rule 4: Must form a contiguous line back to the starting card
-  return hasPathToStart(board, index, card);
-};
-
-/**
- * Check if there's a valid path from the given position back to the start
- * @param {Card[]} board - Current game board
- * @param {number} startIndex - Starting position to check from
- * @param {Card} newCard - Card being placed (if any)
- * @returns {boolean} True if valid path exists
- */
-export const hasPathToStart = (board, startIndex, newCard = null) => {
-  // Create a temporary board with the new card
-  const tempBoard = [...board];
-  if (newCard) {
-    tempBoard[startIndex] = newCard;
+  // Skip path matching for destination cards
+  if (isDestinationCard(card2)) {
+    return true;
   }
+  
+  const oppositeDirection = getOppositeDirection(direction);
+  
+  // Check if both cards have paths in the connecting directions
+  const card1HasPath = card1.paths.some(path => path.includes(direction));
+  const card2HasPath = card2.paths.some(path => path.includes(oppositeDirection));
+  
+  return card1HasPath && card2HasPath;
+}
 
-  // Find the start card position
-  const startCardIndex = tempBoard.findIndex(card => card?.id === SPECIAL_CARDS.START);
-  if (startCardIndex === -1) return false;
+/**
+ * Get adjacent card positions for a given position
+ * @param {number} position - Position to get adjacents for
+ * @param {number} boardSize - Size of the board
+ * @returns {Object} - Map of directions to adjacent positions
+ */
+function getAdjacentPositions(position, boardSize) {
+  const row = Math.floor(position / boardSize);
+  const col = position % boardSize;
+  const adjacents = {};
+  
+  // Check top
+  if (row > 0) {
+    adjacents[DIRECTIONS.TOP] = position - boardSize;
+  }
+  
+  // Check right
+  if (col < boardSize - 1) {
+    adjacents[DIRECTIONS.RIGHT] = position + 1;
+  }
+  
+  // Check bottom
+  if (row < boardSize - 1) {
+    adjacents[DIRECTIONS.BOTTOM] = position + boardSize;
+  }
+  
+  // Check left
+  if (col > 0) {
+    adjacents[DIRECTIONS.LEFT] = position - 1;
+  }
+  
+  return adjacents;
+}
 
-  // Keep track of visited positions
+/**
+ * Check if a card has a path back to the start
+ * @param {Array} board - Game board
+ * @param {number} position - Position to check from
+ * @param {Object} card - Card to check
+ * @returns {boolean} - Whether there is a path to start
+ */
+export function hasPathToStart(board, position, card) {
+  if (!card) return false;
+  
+  const boardSize = Math.sqrt(board.length);
   const visited = new Set();
-
-  const dfs = (currentIndex) => {
-    if (currentIndex === startCardIndex) return true;
-    visited.add(currentIndex);
-
-    // Check each direction
-    const directions = [
-      { dir: DIRECTIONS.TOP, offset: -BOARD_SIZE, valid: currentIndex >= BOARD_SIZE },
-      { dir: DIRECTIONS.RIGHT, offset: 1, valid: (currentIndex % BOARD_SIZE) < (BOARD_SIZE - 1) },
-      { dir: DIRECTIONS.BOTTOM, offset: BOARD_SIZE, valid: currentIndex < (BOARD_SIZE * (BOARD_SIZE - 1)) },
-      { dir: DIRECTIONS.LEFT, offset: -1, valid: (currentIndex % BOARD_SIZE) > 0 }
-    ];
-
-    for (const { dir, offset, valid } of directions) {
-      const nextIndex = currentIndex + offset;
-      
-      if (valid && !visited.has(nextIndex)) {
-        const currentCard = tempBoard[currentIndex];
-        const nextCard = tempBoard[nextIndex];
-        
-        // Check if there's a connecting path between the cards
-        if (currentCard && nextCard && haveConnectingPath(currentCard, nextCard, dir)) {
-          if (dfs(nextIndex)) {
-            return true;
-          }
-        }
-      }
+  const toVisit = [position];
+  
+  while (toVisit.length > 0) {
+    const currentPos = toVisit.pop();
+    if (visited.has(currentPos)) continue;
+    visited.add(currentPos);
+    
+    const currentCard = currentPos === position ? card : board[currentPos];
+    if (!currentCard) continue;
+    
+    // If we found the start card, we have a path
+    if (currentCard.type === 'start' || currentCard.id === SPECIAL_CARDS.START) {
+      return true;
     }
+    
+    // Get adjacent positions
+    const adjacents = getAdjacentPositions(currentPos, boardSize);
+    
+    // Check each adjacent position
+    Object.entries(adjacents).forEach(([direction, adjPos]) => {
+      const adjCard = board[adjPos];
+      if (!adjCard || visited.has(adjPos)) return;
+      
+      // Check if the cards connect
+      if (haveConnectingPath(currentCard, adjCard, Number(direction))) {
+        toVisit.push(adjPos);
+      }
+    });
+  }
+  
+  return false;
+}
 
-    return false;
-  };
-
-  return dfs(startIndex);
-};
+/**
+ * Check if a card can be placed at a position
+ * @param {Array} board - Game board
+ * @param {number} position - Position to check
+ * @param {Object} card - Card to check
+ * @returns {boolean} - Whether the card can be placed
+ */
+export function isValidDrop(board, position, card) {
+  if (!card || board[position]) return false;
+  
+  const boardSize = Math.sqrt(board.length);
+  const adjacents = getAdjacentPositions(position, boardSize);
+  
+  // Must be adjacent to at least one non-destination card
+  let hasAdjacentCard = false;
+  
+  // Check each adjacent position
+  for (const [direction, adjPos] of Object.entries(adjacents)) {
+    const adjCard = board[adjPos];
+    if (!adjCard) continue;
+    
+    // Skip destination cards for adjacency check
+    if (isDestinationCard(adjCard)) continue;
+    
+    hasAdjacentCard = true;
+    
+    // Check if paths match with adjacent card
+    if (!pathsMatch(card, adjCard, Number(direction))) {
+      console.log('Failed path match:', card, adjCard, direction);
+      return false;
+    }
+  }
+  
+  // Must be adjacent to at least one card and have a path to start
+  const isValid = hasAdjacentCard && hasPathToStart(board, position, card);
+  console.log('isValidDrop:', position, card, isValid);
+  return isValid;
+}
