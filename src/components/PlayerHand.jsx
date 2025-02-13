@@ -1,6 +1,6 @@
 import React from 'react';
 import Card from './Card';
-import { STYLES } from '../constants/gameConstants';
+import '../styles/PlayerHand.css';
 
 /**
  * Component for displaying and managing a player's hand of cards
@@ -13,47 +13,21 @@ import { STYLES } from '../constants/gameConstants';
  */
 const PlayerHand = ({ cards, selectedCard, onCardSelect, onCardDragStart, playerName }) => {
   return (
-    <div className="player-hand-container" style={{
-      position: 'fixed',
-      bottom: '20px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: '10px'
-    }}>
-      <div className="player-name" style={{
-        color: '#fff',
-        fontSize: '1.2em',
-        textShadow: '0 2px 4px rgba(0,0,0,0.2)'
-      }}>
+    <div className="player-hand-container">
+      <div className="player-name">
         {playerName}'s Hand
       </div>
-      <div className="cards-container" style={{
-        display: 'flex',
-        gap: '10px',
-        padding: '10px',
-        backgroundColor: 'rgba(45, 45, 45, 0.9)',
-        borderRadius: '10px',
-        boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
-      }}>
+      <div className="cards-container">
         {cards.map((card, index) => card && (
           <div 
             key={`hand-${index}-${card.id || 'unknown'}`}
-            draggable
-            onDragStart={() => onCardDragStart(card)}
-            style={{
-              transform: card === selectedCard ? 'translateY(-10px)' : 'none',
-              transition: 'transform 0.2s ease',
-              cursor: 'pointer'
-            }}
+            className={`hand-card ${card === selectedCard ? 'selected' : ''}`}
           >
             <Card
-              paths={card.paths}
+              {...card}
               selected={card === selectedCard}
               onClick={() => onCardSelect(index)}
-              cardId={card.id}
+              onDragStart={() => onCardDragStart(card)}
             />
           </div>
         ))}

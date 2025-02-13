@@ -3,6 +3,8 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import GameBoard from './components/GameBoard';
 import { GameStateProvider } from './state/GameStateContext';
+import './styles/variables.css';
+import './styles/global.css';
 
 /**
  * Initial player state

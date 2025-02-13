@@ -1,48 +1,42 @@
 import React from 'react';
+import { useDrop } from 'react-dnd';
 import Card from './Card';
-import { STYLES } from '../constants/gameConstants';
+import '../styles/BoardCell.css';
 
-const BoardCell = ({ card, isValidPlacement, onClick }) => {
+const BoardCell = ({ card, isValidPlacement, onClick, onDrop, positionId }) => {
+  const [{ isOver, canDrop }, drop] = useDrop(() => ({
+    accept: 'card',
+    canDrop: (item) => {
+      // console.log('🎯 Checking if drop is valid:', { isValidPlacement, item, positionId });
+      return isValidPlacement;
+    },
+    drop: (item) => {
+      console.log('🎯 Drop attempt:', { item, isValidPlacement, positionId });
+      if (isValidPlacement) {
+        console.log('🎯 Drop accepted, calling onDrop');
+        onDrop(item);
+        return { dropped: true };
+      }
+      console.log('🎯 Drop rejected: not a valid placement');
+      return undefined;
+    },
+    collect: monitor => ({
+      isOver: !!monitor.isOver(),
+      canDrop: !!monitor.canDrop()
+    })
+  }));
+
   return (
     <div
+      ref={drop}
       onClick={onClick}
-      style={{
-        width: STYLES.CARD_WIDTH,
-        height: STYLES.CARD_HEIGHT,
-        border: isValidPlacement ? '2px dashed #4CAF50' : '2px solid #1a1a1a',
-        borderRadius: STYLES.CELL_BORDER_RADIUS,
-        backgroundColor: card ? 'transparent' : '#1a1a1a',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        cursor: isValidPlacement ? 'pointer' : 'default',
-        transition: 'all 0.2s ease',
-        boxSizing: 'border-box',
-        margin: 0,
-        padding: 0,
-        position: 'relative'
-      }}
+      id={positionId}
+      className={`board-cell ${isValidPlacement ? 'valid-placement' : ''} ${isOver && canDrop ? 'drag-over' : ''}`}
     >
-      {card && (
-        <Card 
-          paths={card.paths}
-          type={card.type}
-          id={card.id}
-          cardId={card.cardId}
-        />
-      )}
-      {isValidPlacement && !card && (
-        <div style={{
-          position: 'absolute',
-          color: '#4CAF50',
-          fontWeight: 'bold',
-          fontSize: '14px',
-          textShadow: '0 1px 2px rgba(0,0,0,0.2)',
-          pointerEvents: 'none'
-        }}>
-          Play Here
-        </div>
+      {card ? (
+        <Card {...card} />
+      ) : (
+        <div className="empty-cell-placeholder" />
       )}
     </div>
   );

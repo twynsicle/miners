@@ -1,0 +1,29 @@
+.deck-display {
+  background-color: var(--bg-elevated);
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  width: 200px;
+}
+
+.deck-display h3 {
+  margin: 0 0 15px 0;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.deck-counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: var(--bg-secondary);
+  padding: 10px;
+  border-radius: 5px;
+  color: var(--text-secondary);
+}
+
+.deck-icon {
+  font-size: 24px;
+  filter: brightness(0.9);
+}

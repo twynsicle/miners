@@ -6,6 +6,7 @@ import { STYLES } from '../constants/gameConstants';
 import * as gameUtils from '../utils/gameUtils';
 import { DeckDisplay } from './Deck';
 import { useGameState, useGameDispatch, gameActions } from '../state/GameStateContext';
+import '../styles/GameBoard.css';
 
 const GameBoard = () => {
   const {
@@ -62,13 +63,37 @@ const GameBoard = () => {
   };
 
   const handleCardDragStart = (card) => {
+    console.log('🎮 Card drag started in GameBoard:', card);
     dispatch(gameActions.dragCard(card));
   };
 
   const handleBoardClick = (row, col) => {
     const position = `${row},${col}`;
+    console.log('🎮 Board cell clicked:', { row, col, position });
     if ((selectedCard || draggedCard) && isValidDrop(position, selectedCard || draggedCard)) {
+      console.log('🎮 Placing card via click:', { card: selectedCard || draggedCard });
       dispatch(gameActions.placeCard(position, selectedCard || draggedCard));
+    }
+  };
+
+  const handleCellDrop = (row, col, droppedCard) => {
+    const position = `${row},${col}`;
+    console.log('🎮 Cell drop handler:', { row, col, position, droppedCard });
+    
+    const activePlayer = players.find(p => p.id === activePlayerId);
+    console.log('🎮 Active player hand:', activePlayer.hand);
+    
+    const cardInHand = activePlayer.hand.find(c => c.cardId === droppedCard.cardId);
+    console.log('🎮 Found card in hand:', cardInHand);
+    
+    if (cardInHand && isValidDrop(position, cardInHand)) {
+      console.log('🎮 Placing card via drop');
+      dispatch(gameActions.placeCard(position, cardInHand));
+    } else {
+      console.log('🎮 Drop rejected:', { 
+        hasCard: !!cardInHand, 
+        isValid: cardInHand ? isValidDrop(position, cardInHand) : false 
+      });
     }
   };
 
@@ -83,17 +108,20 @@ const GameBoard = () => {
       const cells = [];
       for (let col = 0; col < 9; col++) {
         const position = `${row},${col}`;
+        const positionId = `${col + 1}-${row + 1}`;
         cells.push(
           <BoardCell
             key={position}
+            positionId={positionId}
             card={board[position]}
             isValidPlacement={validPositions.has(position)}
             onClick={() => handleBoardClick(row, col)}
+            onDrop={(droppedCard) => handleCellDrop(row, col, droppedCard)}
           />
         );
       }
       rows.push(
-        <div key={row} style={{ display: 'flex', gap: STYLES.CELL_GAP }}>
+        <div key={row} className="board-row">
           {cells}
         </div>
       );
@@ -102,39 +130,10 @@ const GameBoard = () => {
   };
 
   return (
-    <div className="game-container" style={{
-      display: 'flex',
-      padding: '20px',
-      minHeight: '100vh',
-      backgroundColor: STYLES.GAME_BG,
-      position: 'relative',
-      gap: '20px'
-    }}>
+    <div className="game-container">
       {/* Main game area */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        flex: '1 1 auto',
-        alignItems: 'center',
-        gap: '20px',
-        minWidth: 0 // Prevent flex items from overflowing
-      }}>
-        <div 
-          ref={boardRef}
-          className="game-board"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: STYLES.CELL_GAP,
-            padding: '20px',
-            backgroundColor: STYLES.BOARD_BG,
-            borderRadius: '10px',
-            margin: '0 auto',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-            transform: 'scale(1.1)',
-            transformOrigin: 'top center'
-          }}
-        >
+      <div className="game-main">
+        <div ref={boardRef} className="game-board">
           {renderBoard()}
         </div>
 
@@ -148,35 +147,14 @@ const GameBoard = () => {
       </div>
 
       {/* Right sidebar */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px',
-        flex: '0 0 auto',
-        width: '220px' // Fixed width for the sidebar
-      }}>
+      <div className="game-sidebar">
         <DeckDisplay cardsRemaining={cardsRemaining} />
         <PlayerList players={players} activePlayerId={activePlayerId} />
       </div>
 
       <button
+        className="reset-button"
         onClick={() => dispatch(gameActions.resetGame())}
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          padding: '10px 20px',
-          backgroundColor: '#ff4444',
-          color: 'white',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-          fontWeight: 'bold',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-          transition: 'background-color 0.2s',
-        }}
-        onMouseOver={(e) => e.target.style.backgroundColor = '#ff6666'}
-        onMouseOut={(e) => e.target.style.backgroundColor = '#ff4444'}
       >
         Reset Game
       </button>

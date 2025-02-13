@@ -73,12 +73,12 @@ export function pathsMatch(card1, card2, direction) {
   
   const oppositeDirection = getOppositeDirection(direction);
   
-  // Check if either card has a path in the connecting direction
+  // Check if both cards have paths in the connecting directions
   const card1HasPath = card1.paths.some(path => path.includes(direction));
   const card2HasPath = card2.paths.some(path => path.includes(oppositeDirection));
   
-  // Paths match if either both have connecting paths or neither does
-  return card1HasPath === card2HasPath;
+  // Both cards must have connecting paths
+  return card1HasPath && card2HasPath;
 }
 
 /**
@@ -192,6 +192,7 @@ export function hasPathToStart(board, position, card) {
  * @returns {boolean} - Whether the card can be placed
  */
 export function isValidDrop(board, position, card) {
+  console.log('testing valid drop', position, card.paths)
   if (!card || board[position]) return false;
   
   const boardSize = Math.sqrt(board.length);

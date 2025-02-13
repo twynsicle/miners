@@ -1,12 +1,18 @@
 import React from 'react';
 import { useDrag } from 'react-dnd';
-import { STYLES } from '../constants/gameConstants';
 import { getCardImageFilename } from '../utils/cardUtils';
+import '../styles/Card.css';
 
-const Card = ({ paths, type, id, cardId, selected, onClick }) => {
+const Card = ({ paths, type, id, cardId, selected, onClick, onDragStart }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'card',
-    item: { paths, id: cardId },
+    item: () => {
+      console.log('🎴 Card drag started:', { paths, type, id, cardId });
+      if (onDragStart) {
+        onDragStart();
+      }
+      return { paths, type, id, cardId };
+    },
     collect: monitor => ({
       isDragging: !!monitor.isDragging(),
     }),
@@ -32,27 +38,12 @@ const Card = ({ paths, type, id, cardId, selected, onClick }) => {
     <div
       ref={drag}
       onClick={onClick}
-      style={{
-        width: STYLES.CARD_WIDTH,
-        height: STYLES.CARD_HEIGHT,
-        border: selected ? `4px solid ${STYLES.SELECTED_CARD_BORDER}` : '4px solid transparent',
-        borderRadius: STYLES.CELL_BORDER_RADIUS,
-        cursor: 'pointer',
-        opacity: isDragging ? 0.5 : 1,
-        position: 'relative',
-        backgroundColor: 'white',
-        boxSizing: 'border-box'
-      }}
+      className={`card ${selected ? 'selected' : ''} ${isDragging ? 'dragging' : ''}`}
     >
       <img
         src={imagePath}
         alt={getPathDisplay()}
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'contain',
-          pointerEvents: 'none'
-        }}
+        className="card-image"
         onError={(e) => {
           // If the image fails to load, show a placeholder with the path pattern
           e.target.style.display = 'none';

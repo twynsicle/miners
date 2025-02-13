@@ -23,7 +23,7 @@ export const possibleCards = [
   { paths: [[1, 2]], count: 4 }, // Bottom-right corner / top-left corner
 
   // Two-way paths with dead ends
-  { paths: [[0, 2], [2]], count: 2 }, 
+  { paths: [[0, 2], [1]], count: 2 }, 
   { paths: [[0, 2], [3]], count: 2 }, 
   { paths: [[1, 2], [0]], count: 2 }, 
   { paths: [[1, 3], [0]], count: 2 }, 
