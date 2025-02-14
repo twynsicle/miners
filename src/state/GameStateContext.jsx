@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { SPECIAL_CARDS } from '../constants/gameConstants';
-import { Deck } from '../components/Deck';
+import { Deck } from '../classes/Deck';
 
 // Create context
 const GameStateContext = createContext();

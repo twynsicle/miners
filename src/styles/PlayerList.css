@@ -1,9 +1,11 @@
 .player-list {
-  background-color: var(--bg-elevated);
-  border-radius: 10px;
-  padding: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius);
+  width: 300px;
 }
 
 .player-list h3 {
@@ -12,61 +14,82 @@
   color: var(--text-primary);
 }
 
+.player-list-title {
+  margin: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
 .player-card {
-  padding: 10px;
-  margin-bottom: 8px;
-  background-color: var(--bg-secondary);
-  border-radius: 5px;
   display: flex;
-  flex-direction: column;
-  gap: 5px;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius);
   transition: all 0.2s ease;
+  border: 1px solid var(--border-subtle);
 }
 
 .player-card.active {
-  background-color: color-mix(in srgb, var(--accent-primary) 15%, var(--bg-secondary));
-  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+  background-color: color-mix(in srgb, var(--accent-primary) 10%, var(--bg-secondary));
+  border-color: var(--accent-primary);
 }
 
 .player-info {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .player-avatar {
   font-size: 24px;
 }
 
+.player-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .player-name {
-  flex: 1;
+  font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .active-indicator {
-  color: var(--accent-primary);
+  color: var(--accent-success);
+  font-size: 1.2rem;
+  flex-shrink: 0;
 }
 
 .debuff-container {
-  min-height: 24px;
-  padding: 4px;
-  background-color: color-mix(in srgb, black 10%, var(--bg-secondary));
-  border-radius: 3px;
-  font-size: 12px;
-  color: var(--text-muted);
   display: flex;
-  gap: 4px;
+  gap: 0.5rem;
   flex-wrap: wrap;
-}
-
-.no-debuffs {
-  font-style: italic;
-  color: var(--text-muted);
+  margin-top: 0.25rem;
 }
 
 .debuff-tag {
-  padding: 2px 6px;
-  background-color: color-mix(in srgb, var(--accent-danger) 15%, var(--bg-secondary));
-  border-radius: 3px;
-  color: color-mix(in srgb, var(--accent-danger) 90%, white);
+  padding: 0.25rem 0.5rem;
+  background-color: var(--bg-danger);
+  color: var(--text-inverse);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.8rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.no-debuffs {
+  color: var(--text-subtle);
+  font-size: 0.8rem;
+  font-style: italic;
 }

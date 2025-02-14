@@ -1,15 +1,16 @@
-import React from 'react';
 import { possibleCards } from '../possibleCards';
-import '../styles/Deck.css';
+import { Card } from '../types/game';
 
 export class Deck {
+  private cards: Card[];
+
   constructor() {
     this.cards = this.createDeck();
     this.shuffle();
   }
 
-  createDeck() {
-    const deck = [];
+  private createDeck(): Card[] {
+    const deck: Card[] = [];
     
     // Create cards based on possibleCards configuration
     possibleCards.forEach((cardConfig, configIndex) => {
@@ -17,7 +18,9 @@ export class Deck {
       for (let i = 0; i < cardConfig.count; i++) {
         deck.push({
           paths: cardConfig.paths,
-          id: `${configIndex}-${i + 1}` // e.g., "0-1" for first card of first config
+          type: 'path',
+          id: `${configIndex}-${i + 1}`, // e.g., "0-1" for first card of first config
+          cardId: `${configIndex}-${i + 1}`
         });
       }
     });
@@ -25,28 +28,18 @@ export class Deck {
     return deck;
   }
 
-  shuffle() {
+  private shuffle(): void {
     for (let i = this.cards.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
     }
   }
 
-  drawCard() {
+  drawCard(): Card | undefined {
     return this.cards.pop();
   }
 
-  getCardsRemaining() {
+  getCardsRemaining(): number {
     return this.cards.length;
   }
 }
-
-export const DeckDisplay = ({ cardsRemaining }) => (
-  <div className="deck-display">
-    <h3>Deck</h3>
-    <div className="deck-counter">
-      <span className="deck-icon">🎴</span>
-      <span>{cardsRemaining} cards remaining</span>
-    </div>
-  </div>
-);

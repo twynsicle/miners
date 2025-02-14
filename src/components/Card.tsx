@@ -1,9 +1,16 @@
 import React from 'react';
 import { useDrag } from 'react-dnd';
 import { getCardImageFilename } from '../utils/cardUtils';
+import { Card as CardType, PathsType } from '../types/game';
 import '../styles/Card.css';
 
-const Card = ({ paths, type, id, cardId, selected, onClick, onDragStart }) => {
+interface CardProps extends CardType {
+  selected?: boolean;
+  onClick?: () => void;
+  onDragStart?: () => void;
+}
+
+const Card: React.FC<CardProps> = ({ paths, type, id, cardId, selected, onClick, onDragStart }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'card',
     item: () => {
@@ -44,11 +51,14 @@ const Card = ({ paths, type, id, cardId, selected, onClick, onDragStart }) => {
         src={imagePath}
         alt={getPathDisplay()}
         className="card-image"
-        onError={(e) => {
+        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
           // If the image fails to load, show a placeholder with the path pattern
-          e.target.style.display = 'none';
-          e.target.parentElement.style.backgroundColor = '#f0f0f0';
-          e.target.parentElement.textContent = getPathDisplay();
+          const target = e.target as HTMLImageElement;
+          target.style.display = 'none';
+          if (target.parentElement) {
+            target.parentElement.style.backgroundColor = '#f0f0f0';
+            target.parentElement.textContent = getPathDisplay();
+          }
         }}
       />
     </div>

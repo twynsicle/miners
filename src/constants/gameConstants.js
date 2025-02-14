@@ -27,17 +27,6 @@ export const DIRECTIONS = {
 };
 
 /**
- * Player constants
- */
-export const PLAYERS = [
-  { id: 1, name: 'Thorin Goldbeard', avatar: '👑', score: 0 },
-  { id: 2, name: 'Gimli Axemaster', avatar: '⚔️', score: 0 },
-  { id: 3, name: 'Dwalin Stonefist', avatar: '🛡️', score: 0 },
-  { id: 4, name: 'Balin Silverbeard', avatar: '📚', score: 0 },
-  { id: 5, name: 'Bofur Pickswing', avatar: '⛏️', score: 0 }
-];
-
-/**
  * Game visual styles
  */
 export const STYLES = {
