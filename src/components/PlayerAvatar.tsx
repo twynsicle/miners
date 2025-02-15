@@ -8,19 +8,10 @@ interface PlayerAvatarProps {
   isActive?: boolean;
 }
 
-const PlayerAvatar: React.FC<PlayerAvatarProps> = ({ 
-  avatarUrl, 
-  playerName, 
-  size = 'medium',
-  isActive = false
-}) => {
+const PlayerAvatar: React.FC<PlayerAvatarProps> = ({ avatarUrl, playerName, size = 'medium', isActive = false }) => {
   return (
     <div className={`player-avatar ${size} ${isActive ? 'active' : ''}`}>
-      <img 
-        src={avatarUrl} 
-        alt={`${playerName}'s avatar`}
-        className="avatar-image"
-      />
+      <img src={avatarUrl} alt={`${playerName}'s avatar`} className="avatar-image" />
     </div>
   );
 };

@@ -17,25 +17,28 @@ interface DragItem {
 }
 
 const BoardCell: React.FC<BoardCellProps> = ({ card, isValidPlacement, onClick, onDrop, positionId }) => {
-  const [{ isOver, canDrop }, drop] = useDrop(() => ({
-    accept: 'CARD',
-    canDrop: () => isValidPlacement,
-    drop: (item: DragItem) => {
-      console.log('🎯 Drop attempt:', { item, isValidPlacement, positionId });
-      if (isValidPlacement) {
-        console.log('🎯 Drop accepted, calling onDrop');
-        // The card will be looked up in the parent component
-        onDrop({ id: item.id } as Card);
-        return { dropped: true };
-      }
-      console.log('🎯 Drop rejected: not a valid placement');
-      return undefined;
-    },
-    collect: monitor => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop()
-    })
-  }), [isValidPlacement, onDrop]);
+  const [{ isOver, canDrop }, drop] = useDrop(
+    () => ({
+      accept: 'CARD',
+      canDrop: () => isValidPlacement,
+      drop: (item: DragItem) => {
+        console.log('🎯 Drop attempt:', { item, isValidPlacement, positionId });
+        if (isValidPlacement) {
+          console.log('🎯 Drop accepted, calling onDrop');
+          // The card will be looked up in the parent component
+          onDrop({ id: item.id } as Card);
+          return { dropped: true };
+        }
+        console.log('🎯 Drop rejected: not a valid placement');
+        return undefined;
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+        canDrop: monitor.canDrop(),
+      }),
+    }),
+    [isValidPlacement, onDrop],
+  );
 
   return (
     <div
@@ -44,11 +47,7 @@ const BoardCell: React.FC<BoardCellProps> = ({ card, isValidPlacement, onClick, 
       id={positionId}
       className={`board-cell ${isValidPlacement ? 'valid-placement' : ''} ${isOver && canDrop ? 'drag-over' : ''}`}
     >
-      {card ? (
-        <CardDisplay card={card} />
-      ) : (
-        <div className="empty-cell-placeholder" />
-      )}
+      {card ? <CardDisplay card={card} /> : <div className="empty-cell-placeholder" />}
     </div>
   );
 };

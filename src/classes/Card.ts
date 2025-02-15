@@ -1,4 +1,4 @@
-import {CardType, PathsType} from "@/types";
+import { CardType, PathsType } from '@/types';
 
 export class Card {
   readonly paths: PathsType;
@@ -50,10 +50,10 @@ export class Card {
     if (!this.paths) return 'Empty';
     if (this.type === 'start') return 'Start';
     if (this.type === 'dest') return `Destination ${this.id}`;
-    
+
     // For regular cards, show base path pattern without identifier
     if (Array.isArray(this.paths[0])) {
-      return this.paths.map(p => Array.isArray(p) ? p.join('-') : p).join('_');
+      return this.paths.map((p) => (Array.isArray(p) ? p.join('-') : p)).join('_');
     }
     return this.paths.join('-');
   }
@@ -62,10 +62,6 @@ export class Card {
    * Create a copy of this card
    */
   clone(): Card {
-    return new Card(
-      Array.isArray(this.paths) ? [...this.paths] : this.paths,
-      this.type,
-      this.id
-    );
+    return new Card(Array.isArray(this.paths) ? [...this.paths] : this.paths, this.type, this.id);
   }
 }

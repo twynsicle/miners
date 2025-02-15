@@ -12,7 +12,7 @@
 .player-name {
   color: var(--text-primary);
   font-size: 1.2em;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .cards-container {
@@ -21,7 +21,7 @@
   padding: 10px;
   background-color: color-mix(in srgb, var(--bg-elevated) 90%, transparent);
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .hand-card {

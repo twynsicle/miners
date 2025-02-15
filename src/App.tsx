@@ -25,8 +25,8 @@ const GameInitializer: React.FC = () => {
 const App: React.FC = () => {
   return (
     <Provider store={store}>
-            <DndProvider backend={HTML5Backend}>
-      <GameInitializer />
+      <DndProvider backend={HTML5Backend}>
+        <GameInitializer />
       </DndProvider>
     </Provider>
   );

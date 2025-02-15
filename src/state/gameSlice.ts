@@ -1,10 +1,10 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {Card} from '@/classes/Card';
-import {Deck} from '@/classes/Deck';
-import {PlayerStatus} from '@/classes/Player';
-import {SPECIAL_CARDS} from '@/constants/gameConstants';
-import {DEFAULT_PLAYERS} from '@/constants/playerConstants';
-import {CardType} from "@/types";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Card } from '@/classes/Card';
+import { Deck } from '@/classes/Deck';
+import { PlayerStatus } from '@/classes/Player';
+import { SPECIAL_CARDS } from '@/constants/gameConstants';
+import { DEFAULT_PLAYERS } from '@/constants/playerConstants';
+import { CardType } from '@/types';
 
 export interface SerializedCard {
   paths: string;
@@ -77,7 +77,7 @@ const createInitialState = (): NormalizedGameState => {
   });
 
   // Create players and deal cards
-  DEFAULT_PLAYERS.forEach(config => {
+  DEFAULT_PLAYERS.forEach((config) => {
     const handIds: string[] = [];
 
     // Deal 5 cards to each player
@@ -95,13 +95,13 @@ const createInitialState = (): NormalizedGameState => {
       name: config.name,
       avatar: config.avatar,
       handIds,
-      statuses: []
+      statuses: [],
     };
     playerIds.push(config.id);
   });
 
   // Add remaining deck cards to state
-  deck.cards.forEach(card => {
+  deck.cards.forEach((card) => {
     cardsById[card.id] = card.toJSON();
     cardIds.push(card.id);
     deckCardIds.push(card.id);
@@ -110,20 +110,20 @@ const createInitialState = (): NormalizedGameState => {
   return {
     cards: {
       byId: cardsById,
-      allIds: cardIds
+      allIds: cardIds,
     },
     players: {
       byId: playersById,
-      allIds: playerIds
+      allIds: playerIds,
     },
     board,
     activePlayerId: playerIds[0],
     selectedCardId: null,
     draggedCardId: null,
     deck: {
-      cardIds: deckCardIds
+      cardIds: deckCardIds,
     },
-    cardsRemaining: deckCardIds.length
+    cardsRemaining: deckCardIds.length,
   };
 };
 
@@ -145,18 +145,18 @@ const gameSlice = createSlice({
     },
     placeCard: (state, action: PayloadAction<{ position: string; cardId: string }>) => {
       const { position, cardId } = action.payload;
-      
+
       // Place card on board
       state.board[position] = cardId;
       state.selectedCardId = null;
       state.draggedCardId = null;
-      
+
       // Find active player
       const activePlayer = state.players.byId[state.activePlayerId];
       if (activePlayer) {
         // Remove card from player's hand
-        activePlayer.handIds = activePlayer.handIds.filter(id => id !== cardId);
-        
+        activePlayer.handIds = activePlayer.handIds.filter((id) => id !== cardId);
+
         // Draw a new card if available
         if (state.deck.cardIds.length > 0) {
           const newCardId = state.deck.cardIds.pop()!;
@@ -173,8 +173,8 @@ const gameSlice = createSlice({
     resetGame: (state) => {
       const newState = createInitialState();
       Object.assign(state, newState);
-    }
-  }
+    },
+  },
 });
 
 export const gameActions = gameSlice.actions;

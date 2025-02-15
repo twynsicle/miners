@@ -10,16 +10,12 @@ export class Deck {
 
   private createDeck(): Card[] {
     const cards: Card[] = [];
-    
+
     // Create cards based on possibleCards configuration
     possibleCards.forEach((cardConfig, configIndex) => {
       // Create specified number of cards for this path configuration
       for (let i = 0; i < cardConfig.count; i++) {
-        const card = new Card(
-          cardConfig.paths,
-          'path',
-          `path_${configIndex}_${i + 1}`,
-        );
+        const card = new Card(cardConfig.paths, 'path', `path_${configIndex}_${i + 1}`);
         cards.push(card);
       }
     });
@@ -56,7 +52,7 @@ export class Deck {
    */
   toJSON() {
     return {
-      cards: this.cards.map(card => card.toJSON())
+      cards: this.cards.map((card) => card.toJSON()),
     };
   }
 

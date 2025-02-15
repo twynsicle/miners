@@ -11,19 +11,11 @@ const PlayerHand = () => {
 
   return (
     <div className="player-hand-container">
-      <div className="player-name">
-        {activePlayer.name}'s Hand
-      </div>
+      <div className="player-name">{activePlayer.name}'s Hand</div>
       <div className="cards-container">
         {activePlayer.hand.map((card) => (
-          <div 
-            key={`hand-${card.id}`}
-            className={`hand-card ${card.id === selectedCard?.id ? 'selected' : ''}`}
-          >
-            <CardDisplay
-              card={card}
-              isDraggable={true}
-            />
+          <div key={`hand-${card.id}`} className={`hand-card ${card.id === selectedCard?.id ? 'selected' : ''}`}>
+            <CardDisplay card={card} isDraggable={true} />
           </div>
         ))}
       </div>

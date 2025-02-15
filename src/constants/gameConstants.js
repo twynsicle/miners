@@ -11,7 +11,7 @@ export const SPECIAL_CARDS = {
   DEST_PREFIX: 'dest_',
   BLOCK: 'block',
   JUMP: 'jump',
-  SWAP: 'swap'
+  SWAP: 'swap',
 };
 
 /**
@@ -21,5 +21,5 @@ export const DIRECTIONS = {
   TOP: 0,
   RIGHT: 1,
   BOTTOM: 2,
-  LEFT: 3
+  LEFT: 3,
 };

@@ -11,26 +11,26 @@ const __dirname = dirname(__filename);
 // Card dimensions
 const CARD_WIDTH = 180;
 const CARD_HEIGHT = 120;
-const LINE_WIDTH = 28;   // Increased path width
+const LINE_WIDTH = 28; // Increased path width
 const BORDER_WIDTH = 2;
 const BORDER_RADIUS = 12;
 
 // Colors
 const COLORS = {
-  BACKGROUND: '#4a4a4a',     // Dark grey background
-  BORDER: '#2d2d2d',        // Darker border
-  PATH: '#c4a484',          // Sandy brown for tunnels
-  PATH_EDGE: '#8b7355',     // Darker brown for tunnel edges
-  START_PATH: '#deb887',    // Burlywood for start card
-  DEST_PATH: '#b8860b'      // Dark golden for destination
+  BACKGROUND: '#4a4a4a', // Dark grey background
+  BORDER: '#2d2d2d', // Darker border
+  PATH: '#c4a484', // Sandy brown for tunnels
+  PATH_EDGE: '#8b7355', // Darker brown for tunnel edges
+  START_PATH: '#deb887', // Burlywood for start card
+  DEST_PATH: '#b8860b', // Dark golden for destination
 };
 
 // Side center positions (as ratios of width/height)
 const SIDE_CENTERS = [
-  { x: 0.5, y: 0 },    // top
-  { x: 1, y: 0.5 },    // right
-  { x: 0.5, y: 1 },    // bottom
-  { x: 0, y: 0.5 }     // left
+  { x: 0.5, y: 0 }, // top
+  { x: 1, y: 0.5 }, // right
+  { x: 0.5, y: 1 }, // bottom
+  { x: 0, y: 0.5 }, // left
 ];
 
 // Control point offsets for curved paths (as ratio of card size)
@@ -40,7 +40,7 @@ const NOISE_VARIANCE = 8; // Increased wobbliness
 function addNoise(ctx, x, y, variance = NOISE_VARIANCE) {
   return {
     x: x + (Math.random() - 0.5) * variance,
-    y: y + (Math.random() - 0.5) * variance
+    y: y + (Math.random() - 0.5) * variance,
   };
 }
 
@@ -62,7 +62,7 @@ function generateCardImage(paths, pathColor = COLORS.PATH, pathEdgeColor = COLOR
   // Helper function to get absolute coordinates
   const getAbsoluteCoords = (relX, relY) => ({
     x: relX * CARD_WIDTH,
-    y: relY * CARD_HEIGHT
+    y: relY * CARD_HEIGHT,
   });
 
   const center = getAbsoluteCoords(0.5, 0.5);
@@ -78,11 +78,11 @@ function generateCardImage(paths, pathColor = COLORS.PATH, pathEdgeColor = COLOR
       const dy = end.y - start.y;
       const midX = start.x + dx / 2;
       const midY = start.y + dy / 2;
-      
+
       // Control point is perpendicular to the midpoint
       const controlX = midX + (dy > 0 ? -Math.abs(dy) : Math.abs(dy)) * CURVE_OFFSET;
       const controlY = midY + (dx > 0 ? Math.abs(dx) : -Math.abs(dx)) * CURVE_OFFSET;
-      
+
       ctx.quadraticCurveTo(controlX, controlY, end.x, end.y);
     } else if (path.length === 2) {
       // For straight two-point paths, use a curved line with more pronounced curve
@@ -90,13 +90,13 @@ function generateCardImage(paths, pathColor = COLORS.PATH, pathEdgeColor = COLOR
       const dy = end.y - start.y;
       const midX = (start.x + end.x) / 2;
       const midY = (start.y + end.y) / 2;
-      
+
       // Add some random offset to the midpoint perpendicular to the path
       const perpX = -dy * CURVE_OFFSET;
       const perpY = dx * CURVE_OFFSET;
       const controlX = midX + perpX + (Math.random() - 0.5) * NOISE_VARIANCE;
       const controlY = midY + perpY + (Math.random() - 0.5) * NOISE_VARIANCE;
-      
+
       ctx.quadraticCurveTo(controlX, controlY, end.x, end.y);
     } else {
       // For other paths, use multiple control points for more wobbliness
@@ -107,7 +107,7 @@ function generateCardImage(paths, pathColor = COLORS.PATH, pathEdgeColor = COLOR
         const baseY = start.y + (end.y - start.y) * t;
         points.push(addNoise(ctx, baseX, baseY));
       }
-      
+
       // Use multiple quadratic curves to create a more natural path
       points.forEach((point, i) => {
         if (i === points.length - 1) {
@@ -120,12 +120,12 @@ function generateCardImage(paths, pathColor = COLORS.PATH, pathEdgeColor = COLOR
         }
       });
     }
-    
+
     ctx.stroke();
   }
 
   // Draw each path set
-  paths.forEach(path => {
+  paths.forEach((path) => {
     // Draw path edges first (for tunnel effect)
     ctx.strokeStyle = pathEdgeColor;
     ctx.lineWidth = LINE_WIDTH + 4;
@@ -134,16 +134,15 @@ function generateCardImage(paths, pathColor = COLORS.PATH, pathEdgeColor = COLOR
 
     path.forEach((sideIndex, i) => {
       const start = getAbsoluteCoords(SIDE_CENTERS[sideIndex].x, SIDE_CENTERS[sideIndex].y);
-      
+
       if (path.length === 2) {
         // Draw curved path between two sides
         const nextIndex = (i + 1) % path.length;
         const end = getAbsoluteCoords(SIDE_CENTERS[path[nextIndex]].x, SIDE_CENTERS[path[nextIndex]].y);
-        
+
         if (i === 0) {
           // Check if sides are adjacent
-          const isCorner = Math.abs(sideIndex - path[nextIndex]) === 1 || 
-                          Math.abs(sideIndex - path[nextIndex]) === 3;
+          const isCorner = Math.abs(sideIndex - path[nextIndex]) === 1 || Math.abs(sideIndex - path[nextIndex]) === 3;
           drawWobblyPath(ctx, start, end, 4, isCorner);
         }
       } else if (path.length >= 3) {
@@ -152,10 +151,10 @@ function generateCardImage(paths, pathColor = COLORS.PATH, pathEdgeColor = COLOR
       } else {
         // For single paths, draw to a point before the center
         // For top/bottom paths (0,2), make them shorter
-        const distanceRatio = (sideIndex === 0 || sideIndex === 2) ? 0.35 : 0.5;
+        const distanceRatio = sideIndex === 0 || sideIndex === 2 ? 0.35 : 0.5;
         const midPoint = {
           x: start.x + (center.x - start.x) * distanceRatio,
-          y: start.y + (center.y - start.y) * distanceRatio
+          y: start.y + (center.y - start.y) * distanceRatio,
         };
         drawWobblyPath(ctx, start, midPoint);
       }
@@ -164,18 +163,17 @@ function generateCardImage(paths, pathColor = COLORS.PATH, pathEdgeColor = COLOR
     // Draw main path color
     ctx.strokeStyle = pathColor;
     ctx.lineWidth = LINE_WIDTH;
-    
+
     // Repeat the same path drawing logic for the main path color
     path.forEach((sideIndex, i) => {
       const start = getAbsoluteCoords(SIDE_CENTERS[sideIndex].x, SIDE_CENTERS[sideIndex].y);
-      
+
       if (path.length === 2) {
         const nextIndex = (i + 1) % path.length;
         const end = getAbsoluteCoords(SIDE_CENTERS[path[nextIndex]].x, SIDE_CENTERS[path[nextIndex]].y);
-        
+
         if (i === 0) {
-          const isCorner = Math.abs(sideIndex - path[nextIndex]) === 1 || 
-                          Math.abs(sideIndex - path[nextIndex]) === 3;
+          const isCorner = Math.abs(sideIndex - path[nextIndex]) === 1 || Math.abs(sideIndex - path[nextIndex]) === 3;
           drawWobblyPath(ctx, start, end, 4, isCorner);
         }
       } else if (path.length >= 3) {
@@ -184,10 +182,10 @@ function generateCardImage(paths, pathColor = COLORS.PATH, pathEdgeColor = COLOR
       } else {
         // For single paths, draw to a point before the center
         // For top/bottom paths (0,2), make them shorter
-        const distanceRatio = (sideIndex === 0 || sideIndex === 2) ? 0.35 : 0.5;
+        const distanceRatio = sideIndex === 0 || sideIndex === 2 ? 0.35 : 0.5;
         const midPoint = {
           x: start.x + (center.x - start.x) * distanceRatio,
-          y: start.y + (center.y - start.y) * distanceRatio
+          y: start.y + (center.y - start.y) * distanceRatio,
         };
         drawWobblyPath(ctx, start, midPoint);
       }
@@ -204,9 +202,9 @@ if (!fs.existsSync(outputDir)) {
 }
 
 // Generate regular path cards
-possibleCards.forEach(card => {
+possibleCards.forEach((card) => {
   const canvas = generateCardImage(card.paths);
-  const filename = `card_${card.paths.map(path => path.sort().join('')).join('_')}.png`;
+  const filename = `card_${card.paths.map((path) => path.sort().join('')).join('_')}.png`;
   const buffer = canvas.toBuffer('image/png');
   fs.writeFileSync(`${outputDir}/${filename}`, buffer);
 });

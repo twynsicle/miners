@@ -52,7 +52,7 @@ export class Player {
    * Remove a card from the player's hand
    */
   removeCard(cardId: string): Card | undefined {
-    const index = this._hand.findIndex(card => card.id === cardId);
+    const index = this._hand.findIndex((card) => card.id === cardId);
     if (index === -1) return undefined;
     return this._hand.splice(index, 1)[0];
   }
@@ -68,7 +68,7 @@ export class Player {
    * Remove a status effect from the player
    */
   removeStatus(type: string): PlayerStatus | undefined {
-    const index = this._statuses.findIndex(status => status.type === type);
+    const index = this._statuses.findIndex((status) => status.type === type);
     if (index === -1) return undefined;
     return this._statuses.splice(index, 1)[0];
   }
@@ -77,14 +77,14 @@ export class Player {
    * Check if the player has a specific status
    */
   hasStatus(type: string): boolean {
-    return this._statuses.some(status => status.type === type);
+    return this._statuses.some((status) => status.type === type);
   }
 
   /**
    * Update all status durations and remove expired ones
    */
   updateStatuses(): void {
-    this._statuses = this._statuses.filter(status => {
+    this._statuses = this._statuses.filter((status) => {
       status.duration--;
       return status.duration > 0;
     });
@@ -95,7 +95,7 @@ export class Player {
    */
   clone(): Player {
     const player = new Player(this.id, this.name, this.avatar);
-    player._hand = this._hand.map(card => card.clone());
+    player._hand = this._hand.map((card) => card.clone());
     player._statuses = [...this._statuses];
     return player;
   }
@@ -122,8 +122,8 @@ export class Player {
       id: this.id,
       name: this.name,
       avatar: this.avatar,
-      hand: this._hand.map(card => card.toJSON()),
-      statuses: [...this._statuses]
+      hand: this._hand.map((card) => card.toJSON()),
+      statuses: [...this._statuses],
     };
   }
 
@@ -138,10 +138,10 @@ export class Player {
     statuses: PlayerStatus[];
   }): Player {
     const player = new Player(json.id, json.name, json.avatar);
-    json.hand.forEach(cardJson => {
+    json.hand.forEach((cardJson) => {
       player.addCard(Card.fromJSON(cardJson));
     });
-    json.statuses.forEach(status => {
+    json.statuses.forEach((status) => {
       player._statuses.push(status);
     });
     return player;

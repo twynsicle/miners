@@ -9,6 +9,8 @@
     "preview": "vite preview",
     "generate-cards": "node scripts/generateCardImages.js",
     "test": "node --experimental-vm-modules --experimental-import-meta-resolve node_modules/jest/bin/jest.js",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,css,scss,html,json}\"",
     "test:watch": "node --experimental-vm-modules --experimental-import-meta-resolve node_modules/jest/bin/jest.js --watch",
     "test:coverage": "node --experimental-vm-modules --experimental-import-meta-resolve node_modules/jest/bin/jest.js --coverage",
     "find-deadcode": "knip"
@@ -39,6 +41,7 @@
     "jest": "^29.3.1",
     "jest-environment-jsdom": "^29.3.1",
     "knip": "^5.44.1",
+    "prettier": "^3.5.1",
     "ts-jest": "^29.1.2",
     "typescript": "^5.7.3",
     "vite": "^4.1.0"

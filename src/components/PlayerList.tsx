@@ -10,12 +10,9 @@ const PlayerList = () => {
   return (
     <div className="player-list">
       <h3 className="player-list-title">Players</h3>
-      {players.map(player => (
-        <div 
-          key={player.id} 
-          className={`player-card ${player.id === activePlayer?.id ? 'active' : ''}`}
-        >
-          <PlayerAvatar 
+      {players.map((player) => (
+        <div key={player.id} className={`player-card ${player.id === activePlayer?.id ? 'active' : ''}`}>
+          <PlayerAvatar
             avatarUrl={player.avatar}
             playerName={player.name}
             size="medium"
@@ -24,12 +21,10 @@ const PlayerList = () => {
           <div className="player-info">
             <div className="player-name-row">
               <span className="player-name">{player.name}</span>
-              {player.id === activePlayer?.id && (
-                <span className="active-indicator">●</span>
-              )}
+              {player.id === activePlayer?.id && <span className="active-indicator">●</span>}
             </div>
             <div className="debuff-container">
-              {(!player.statuses || player.statuses.length === 0) ? (
+              {!player.statuses || player.statuses.length === 0 ? (
                 <span className="no-debuffs">No active effects</span>
               ) : (
                 // TODO: add proper statuses type

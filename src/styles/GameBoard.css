@@ -25,7 +25,7 @@
   background-color: var(--border-strong);
   border-radius: 8px;
   margin: 0 auto;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .game-sidebar {
@@ -47,7 +47,7 @@
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   transition: all 0.2s ease;
   z-index: 100;
 }
