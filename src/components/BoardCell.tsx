@@ -12,18 +12,22 @@ interface BoardCellProps {
   positionId: string;
 }
 
+interface DragItem {
+  id: string;
+}
+
 const BoardCell: React.FC<BoardCellProps> = ({ card, isValidPlacement, onClick, onDrop, positionId }) => {
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
-    accept: 'card',
-    canDrop: (item: Card) => {
-      // console.log('🎯 Checking if drop is valid:', { isValidPlacement, item, positionId });
+    accept: 'CARD',
+    canDrop: (item: DragItem) => {
       return isValidPlacement;
     },
-    drop: (item: Card) => {
+    drop: (item: DragItem) => {
       console.log('🎯 Drop attempt:', { item, isValidPlacement, positionId });
       if (isValidPlacement) {
         console.log('🎯 Drop accepted, calling onDrop');
-        onDrop(item);
+        // The card will be looked up in the parent component
+        onDrop({ id: item.id } as Card);
         return { dropped: true };
       }
       console.log('🎯 Drop rejected: not a valid placement');
@@ -33,7 +37,7 @@ const BoardCell: React.FC<BoardCellProps> = ({ card, isValidPlacement, onClick, 
       isOver: !!monitor.isOver(),
       canDrop: !!monitor.canDrop()
     })
-  }));
+  }), [isValidPlacement, onDrop]);
 
   return (
     <div

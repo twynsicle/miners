@@ -59,7 +59,10 @@ const CardDisplay: React.FC<CardDisplayProps> = ({
   const [{ isDragging }, dragRef] = useDrag(
     () => ({
       type: 'CARD',
-      item: { id: card.id },  // Only pass the ID
+      item: () => {
+        dispatch(gameActions.dragCard(card.id));
+        return { id: card.id };
+      },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
