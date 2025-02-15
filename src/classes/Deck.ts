@@ -1,5 +1,5 @@
 import { Card } from './Card';
-import { possibleCards } from '../possibleCards';
+import { possibleCards } from '@/possibleCards';
 
 export class Deck {
   cards: Card[];

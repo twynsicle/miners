@@ -1,8 +1,7 @@
-import React from 'react';
 import { useSelector } from 'react-redux';
 import PlayerAvatar from './PlayerAvatar';
 import '../styles/PlayerList.css';
-import { selectAllPlayers, selectActivePlayer } from '../state/selectors';
+import { selectAllPlayers, selectActivePlayer } from '@/state/selectors';
 
 const PlayerList = () => {
   const players = useSelector(selectAllPlayers);
@@ -33,7 +32,8 @@ const PlayerList = () => {
               {(!player.statuses || player.statuses.length === 0) ? (
                 <span className="no-debuffs">No active effects</span>
               ) : (
-                player.statuses.map((status, index) => (
+                // TODO: add proper statuses type
+                player.statuses.map((status: { effect: string; type: string; duration: number }, index: number) => (
                   <span key={index} className="debuff-tag" title={status.effect}>
                     {status.type} ({status.duration})
                   </span>

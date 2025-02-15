@@ -1,14 +1,11 @@
-import { PathsType } from '../types/game';
+import {CardType, PathsType} from "@/types";
 
-/**
- * Represents a card in the game
- */
 export class Card {
   readonly paths: PathsType;
-  readonly type: string;
+  readonly type: CardType;
   readonly id: string;
 
-  constructor(paths: PathsType, type: string, id: string) {
+  constructor(paths: PathsType, type: CardType, id: string) {
     this.paths = paths;
     this.type = type;
     this.id = id;

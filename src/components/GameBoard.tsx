@@ -1,24 +1,23 @@
 import React, { useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useDrop } from 'react-dnd';
+import { useSelector } from 'react-redux';
 import BoardCell from './BoardCell';
 import PlayerHand from './PlayerHand';
 import DeckDisplay from './DeckDisplay';
 import PlayerList from './PlayerList';
-import { useGameDispatch } from '../hooks/useGameDispatch';
-import { gameActions } from '../state/gameSlice';
-import { getValidPositions, isValidDropNew } from '../utils/gameUtils';
-import { Card, GameState, Player } from '../types/game';
-import { RootState } from '../state/store';
-import { 
+import { useGameDispatch } from '@/hooks/useGameDispatch';
+import { gameActions } from '@/state/gameSlice';
+import { getValidPositions, isValidDropNew } from '@/utils/gameUtils';
+import {
   selectBoardCards, 
   selectDraggedCard, 
   selectSelectedCard, 
   selectCardsRemaining, 
   selectActivePlayerId, 
   selectAllPlayers 
-} from '../state/selectors';
+} from '@/state/selectors';
 import '../styles/GameBoard.css';
+import {Card} from "@/classes/Card";
+
 
 const GameBoard: React.FC = () => {
   const dispatch = useGameDispatch();
@@ -42,21 +41,8 @@ const GameBoard: React.FC = () => {
     );
   }
 
-  const handleCardSelect = (index: number) => {
-    const card = activePlayer.hand[index];
-    if (card) {
-      dispatch(gameActions.selectCard(card));
-    }
-  };
-
-  const handleCardDragStart = (card: Card) => {
-    console.log(' Card drag started in GameBoard:', card);
-    dispatch(gameActions.dragCard(card));
-  };
-
   const handleBoardClick = (row: number, col: number) => {
     const position = `${row},${col}`;
-    console.log(' Board cell clicked:', { row, col, position });
     
     // Convert board object to array format for validation
     const boardArray = new Array(9 * 9).fill(null);
@@ -66,17 +52,18 @@ const GameBoard: React.FC = () => {
     });
     
     if ((selectedCard || draggedCard) && isValidDropNew(boardArray, row * 9 + col, selectedCard || draggedCard)) {
-      console.log(' Placing card via click:', { card: selectedCard || draggedCard });
       const card = selectedCard || draggedCard;
-      dispatch(gameActions.placeCard({ position, cardId: card.id }));
+      if (card) {
+        dispatch(gameActions.placeCard({ position, cardId: card.id }));
+      }
     }
   };
 
-  const handleCellDrop = (row: number, col: number, droppedCard: Card) => {
+  const handleCellDrop = (row: number, col: number, droppedCard: { id: string }) => {
     const position = `${row},${col}`;
     console.log(' Cell drop handler:', { row, col, position, droppedCard });
     
-    const cardInHand = activePlayer.hand.find(c => c.cardId === droppedCard.cardId);
+    const cardInHand = activePlayer.hand.find((c: Card) => c.id === droppedCard.id);
     console.log(' Found card in hand:', cardInHand);
     
     // Convert board object to array format for validation
@@ -114,7 +101,7 @@ const GameBoard: React.FC = () => {
             card={boardCards[position] || null}
             isValidPlacement={validPositions.has(position)}
             onClick={() => handleBoardClick(row, col)}
-            onDrop={(droppedCard) => handleCellDrop(row, col, droppedCard)}
+            onDrop={(card) => handleCellDrop(row, col, card)}
           />
         );
       }
@@ -130,27 +117,17 @@ const GameBoard: React.FC = () => {
 
   return (
     <div className="game-container">
-      {/* Main game area */}
       <div className="game-main">
-        <div ref={boardRef} className="game-board">
+        <div className="game-board" ref={boardRef}>
           {renderBoard()}
         </div>
+        <PlayerHand />
 
-        <PlayerHand
-          cards={activePlayer.hand}
-          selectedCard={selectedCard}
-          onCardSelect={handleCardSelect}
-          onCardDragStart={handleCardDragStart}
-          playerName={activePlayer.name}
-        />
       </div>
-
-      {/* Right sidebar */}
       <div className="game-sidebar">
         <DeckDisplay cardsRemaining={cardsRemaining} />
-        <PlayerList players={players} activePlayerId={activePlayerId} />
+        <PlayerList />
       </div>
-
       <button
         className="reset-button"
         onClick={() => dispatch(gameActions.resetGame())}

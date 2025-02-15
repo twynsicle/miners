@@ -52,7 +52,7 @@ export class Player {
    * Remove a card from the player's hand
    */
   removeCard(cardId: string): Card | undefined {
-    const index = this._hand.findIndex(card => card.cardId === cardId);
+    const index = this._hand.findIndex(card => card.id === cardId);
     if (index === -1) return undefined;
     return this._hand.splice(index, 1)[0];
   }

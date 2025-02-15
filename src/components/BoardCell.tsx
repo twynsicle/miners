@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDrop } from 'react-dnd';
 import CardDisplay from './CardDisplay';
-import { Card } from '../classes/Card';
+import { Card } from '@/classes/Card';
 import '../styles/BoardCell.css';
 
 interface BoardCellProps {
@@ -19,9 +19,7 @@ interface DragItem {
 const BoardCell: React.FC<BoardCellProps> = ({ card, isValidPlacement, onClick, onDrop, positionId }) => {
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: 'CARD',
-    canDrop: (item: DragItem) => {
-      return isValidPlacement;
-    },
+    canDrop: () => isValidPlacement,
     drop: (item: DragItem) => {
       console.log('🎯 Drop attempt:', { item, isValidPlacement, positionId });
       if (isValidPlacement) {
@@ -34,8 +32,8 @@ const BoardCell: React.FC<BoardCellProps> = ({ card, isValidPlacement, onClick, 
       return undefined;
     },
     collect: monitor => ({
-      isOver: !!monitor.isOver(),
-      canDrop: !!monitor.canDrop()
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop()
     })
   }), [isValidPlacement, onDrop]);
 

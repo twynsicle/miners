@@ -1,21 +1,22 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Card } from '../classes/Card';
-import { Deck } from '../classes/Deck';
-import { Player } from '../classes/Player';
-import { SPECIAL_CARDS } from '../constants/gameConstants';
-import { DEFAULT_PLAYERS } from '../constants/playerConstants';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {Card} from '@/classes/Card';
+import {Deck} from '@/classes/Deck';
+import {PlayerStatus} from '@/classes/Player';
+import {SPECIAL_CARDS} from '@/constants/gameConstants';
+import {DEFAULT_PLAYERS} from '@/constants/playerConstants';
+import {CardType} from "@/types";
 
-interface SerializedCard {
-  paths: string;  // JSON string of paths
-  type: string;
+export interface SerializedCard {
+  paths: string;
+  type: CardType;
   id: string;
 }
 
-interface SerializedPlayer {
+export interface SerializedPlayer {
   id: number;
   name: string;
   avatar: string;
-  handIds: string[];  // Array of card IDs instead of full cards
+  handIds: string[];
   statuses: PlayerStatus[];
 }
 
@@ -29,13 +30,13 @@ interface NormalizedGameState {
     allIds: number[];
   };
   board: {
-    [position: string]: string;  // Maps position to card ID
+    [position: string]: string;
   };
   activePlayerId: number;
   selectedCardId: string | null;
   draggedCardId: string | null;
   deck: {
-    cardIds: string[];  // Array of card IDs in the deck
+    cardIds: string[];
   };
   cardsRemaining: number;
 }
@@ -63,31 +64,27 @@ const createInitialState = (): NormalizedGameState => {
 
   // Add special cards to the state
   const startCard = createStartCard();
-  const startCardSerialized = startCard.toJSON();
-  cardsById[startCard.id] = startCardSerialized;
+  cardsById[startCard.id] = startCard.toJSON();
   cardIds.push(startCard.id);
   board['7,4'] = startCard.id;
 
   // Add destination cards
   ['1', '2', '3'].forEach((id, index) => {
     const destCard = createDestinationCard(id);
-    const destCardSerialized = destCard.toJSON();
-    cardsById[destCard.id] = destCardSerialized;
+    cardsById[destCard.id] = destCard.toJSON();
     cardIds.push(destCard.id);
     board[`1,${2 + index * 2}`] = destCard.id;
   });
 
   // Create players and deal cards
   DEFAULT_PLAYERS.forEach(config => {
-    const player = new Player(config.id, config.name, config.avatar);
     const handIds: string[] = [];
 
     // Deal 5 cards to each player
     for (let i = 0; i < 5; i++) {
       const card = deck.drawCard();
       if (card) {
-        const serializedCard = card.toJSON();
-        cardsById[card.id] = serializedCard;
+        cardsById[card.id] = card.toJSON();
         cardIds.push(card.id);
         handIds.push(card.id);
       }
@@ -105,8 +102,7 @@ const createInitialState = (): NormalizedGameState => {
 
   // Add remaining deck cards to state
   deck.cards.forEach(card => {
-    const serializedCard = card.toJSON();
-    cardsById[card.id] = serializedCard;
+    cardsById[card.id] = card.toJSON();
     cardIds.push(card.id);
     deckCardIds.push(card.id);
   });
@@ -147,9 +143,6 @@ const gameSlice = createSlice({
       state.draggedCardId = action.payload;
       state.selectedCardId = null;
     },
-    clearDraggedCard: (state) => {
-      state.draggedCardId = null;
-    },
     placeCard: (state, action: PayloadAction<{ position: string; cardId: string }>) => {
       const { position, cardId } = action.payload;
       
@@ -176,9 +169,6 @@ const gameSlice = createSlice({
         const nextPlayerIndex = (currentPlayerIndex + 1) % state.players.allIds.length;
         state.activePlayerId = state.players.allIds[nextPlayerIndex];
       }
-    },
-    setActivePlayer: (state, action: PayloadAction<number>) => {
-      state.activePlayerId = action.payload;
     },
     resetGame: (state) => {
       const newState = createInitialState();

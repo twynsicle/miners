@@ -1,55 +1,23 @@
 import { RootState } from './store';
 import { createSelector } from '@reduxjs/toolkit';
-import { Card } from '../classes/Card';
-import { Player } from '../classes/Player';
+import { Card } from '@/classes/Card';
+import { SerializedCard } from './gameSlice';
 
 // Basic selectors
-const selectGameState = (state: RootState) => state.game;
-const selectPlayers = (state: RootState) => state.game.players;
-const selectBoard = (state: RootState) => state.game.board;
-const selectCards = (state: RootState) => state.game.cards;
+export const selectGameState = (state: RootState) => state.game;
+export const selectCards = (state: RootState) => state.game.cards;
 
 // Helper function to safely create a Card from stored data
-const createCardFromStored = (cardData: any): Card | null => {
+const createCardFromStored = (cardData: SerializedCard | undefined): Card | null => {
   if (!cardData) return null;
   // Parse paths before creating the Card
-  const paths = typeof cardData.paths === 'string' ? JSON.parse(cardData.paths) : cardData.paths;
+  const paths = JSON.parse(cardData.paths);
   return new Card(
     paths,
     cardData.type,
     cardData.id
   );
 };
-
-// Card selectors
-export const selectCardById = createSelector(
-  [selectCards, (state: RootState, cardId: string) => cardId],
-  (cards, cardId) => cards.byId[cardId] ? createCardFromStored(cards.byId[cardId]) : null
-);
-
-export const selectAllCards = createSelector(
-  [selectCards],
-  (cards) => cards.allIds.map(id => createCardFromStored(cards.byId[id])).filter((card): card is Card => card !== null)
-);
-
-// Player selectors
-export const selectPlayerById = createSelector(
-  [selectGameState, selectCards, (state: RootState, playerId: number) => playerId],
-  (game, cards, playerId) => {
-    const player = game.players.byId[playerId];
-    if (!player) return null;
-
-    // Reconstruct player's hand
-    const handCards = player.handIds.map(cardId => 
-      createCardFromStored(game.cards.byId[cardId])
-    ).filter((card): card is Card => card !== null);
-
-    return {
-      ...player,
-      hand: handCards
-    };
-  }
-);
 
 export const selectAllPlayers = createSelector(
   [selectGameState],
@@ -63,7 +31,7 @@ export const selectAllPlayers = createSelector(
       ...player,
       hand: handCards
     };
-  }).filter((player): player is Player => player !== null)
+  }).filter((player): player is any => player !== null)
 );
 
 export const selectActivePlayer = createSelector(
@@ -79,17 +47,6 @@ export const selectActivePlayer = createSelector(
       hand: handCards
     };
   }
-);
-
-// Game state selectors
-export const selectCardsRemaining = createSelector(
-  [selectGameState],
-  (game) => game.cardsRemaining
-);
-
-export const selectActivePlayerId = createSelector(
-  [selectGameState],
-  (game) => game.activePlayerId
 );
 
 // Board selectors
@@ -109,29 +66,23 @@ export const selectBoardCards = createSelector(
   }
 );
 
-export const selectBoardCard = createSelector(
-  [selectGameState, (state: RootState, position: string) => position],
-  (game, position) => {
-    const cardId = game.board[position];
-    return cardId ? createCardFromStored(game.cards.byId[cardId]) : null;
-  }
+// Game state selectors
+export const selectCardsRemaining = createSelector(
+  [selectGameState],
+  (game) => game.cardsRemaining
 );
 
-// Selected/Dragged card selectors
-export const selectSelectedCard = createSelector(
+export const selectActivePlayerId = createSelector(
   [selectGameState],
-  (game) => game.selectedCardId ? createCardFromStored(game.cards.byId[game.selectedCardId]) : null
+  (game) => game.activePlayerId
+);
+
+export const selectSelectedCard = createSelector(
+  [selectGameState, selectCards],
+  (game, cards) => game.selectedCardId ? createCardFromStored(cards.byId[game.selectedCardId]) : null
 );
 
 export const selectDraggedCard = createSelector(
-  [selectGameState],
-  (game) => game.draggedCardId ? createCardFromStored(game.cards.byId[game.draggedCardId]) : null
-);
-
-// Deck selectors
-export const selectDeckCards = createSelector(
-  [selectGameState],
-  (game) => game.deck.cardIds
-    .map(id => createCardFromStored(game.cards.byId[id]))
-    .filter((card): card is Card => card !== null)
+  [selectGameState, selectCards],
+  (game, cards) => game.draggedCardId ? createCardFromStored(cards.byId[game.draggedCardId]) : null
 );

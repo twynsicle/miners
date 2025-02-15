@@ -1,9 +1,8 @@
 import React from 'react';
 import { useDrag } from 'react-dnd';
 import { useDispatch } from 'react-redux';
-import { Card } from '../classes/Card';
-import { gameActions } from '../state/gameSlice';
-import { PathsType } from '../types/game';
+import { Card } from '@/classes/Card';
+import { gameActions } from '@/state/gameSlice';
 import '../styles/CardDisplay.css';
 
 interface CardDisplayProps {
@@ -19,7 +18,7 @@ const getPathDisplay = (card: Card): string => {
   if (card.type === 'dest') return `Destination ${card.id}`;
   
   // Parse paths if it's a string
-  const paths = typeof card.paths === 'string' ? JSON.parse(card.paths) : card.paths;
+  const paths = card.paths;
   
   // For regular cards, show base path pattern
   return paths
@@ -38,7 +37,7 @@ function getCardImageFilename(card: Card): string {
   }
   
   // Parse paths if it's a string
-  const paths = typeof card.paths === 'string' ? JSON.parse(card.paths) : card.paths;
+  const paths = card.paths;
   
   // Regular path cards - format to match existing filenames
   const pathStr = paths
@@ -65,12 +64,7 @@ const CardDisplay: React.FC<CardDisplayProps> = ({
       },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
-      }),
-      end: (item, monitor) => {
-        if (!monitor.didDrop()) {
-          dispatch(gameActions.clearDraggedCard());
-        }
-      },
+      })
     }),
     [card.id]  // Only depend on the ID
   );
