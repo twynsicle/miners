@@ -3,11 +3,9 @@ import { createSelector } from '@reduxjs/toolkit';
 import { Card } from '@/classes/Card';
 import { SerializedCard } from './gameSlice';
 
-// Basic selectors
 export const selectGameState = (state: RootState) => state.game;
 export const selectCards = (state: RootState) => state.game.cards;
 
-// Helper function to safely create a Card from stored data
 const createCardFromStored = (cardData: SerializedCard | undefined): Card | null => {
   if (!cardData) return null;
   // Parse paths before creating the Card
@@ -28,7 +26,7 @@ export const selectAllPlayers = createSelector([selectGameState], (game) =>
         hand: handCards,
       };
     })
-    .filter((player): player is any => player !== null),
+    .filter((player) => player !== null),
 );
 
 export const selectActivePlayer = createSelector([selectGameState], (game) => {

@@ -59,9 +59,9 @@ export class Deck {
   /**
    * Create a Deck instance from a plain object
    */
-  static fromJSON(json: any): Deck {
+  static fromJSON(json: { cards: Card[] }): Deck {
     const deck = new Deck();
-    deck.cards = json.cards.map((cardJson: any) => Card.fromJSON(cardJson));
+    deck.cards = json.cards.map((cardJson: Card) => Card.fromJSON(cardJson));
     return deck;
   }
 

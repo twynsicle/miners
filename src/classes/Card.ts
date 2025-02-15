@@ -14,7 +14,7 @@ export class Card {
   /**
    * Create a Card instance from a plain object
    */
-  static fromJSON(json: any): Card {
+  static fromJSON(json: { paths: string, type: CardType, id: string }): Card {
     return new Card(JSON.parse(json.paths), json.type, json.id);
   }
 
