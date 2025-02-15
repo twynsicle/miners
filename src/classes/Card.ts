@@ -6,14 +6,30 @@ import { PathsType } from '../types/game';
 export class Card {
   readonly paths: PathsType;
   readonly type: string;
-  readonly id?: string;
-  readonly cardId: string;
+  readonly id: string;
 
-  constructor(paths: PathsType, type: string, cardId: string, id?: string) {
+  constructor(paths: PathsType, type: string, id: string) {
     this.paths = paths;
     this.type = type;
     this.id = id;
-    this.cardId = cardId;
+  }
+
+  /**
+   * Create a Card instance from a plain object
+   */
+  static fromJSON(json: any): Card {
+    return new Card(JSON.parse(json.paths), json.type, json.id);
+  }
+
+  /**
+   * Convert the card to a plain object for serialization
+   */
+  toJSON() {
+    return {
+      paths: JSON.stringify(this.paths),
+      type: this.type,
+      id: this.id,
+    };
   }
 
   /**
@@ -52,7 +68,6 @@ export class Card {
     return new Card(
       Array.isArray(this.paths) ? [...this.paths] : this.paths,
       this.type,
-      this.cardId,
       this.id
     );
   }

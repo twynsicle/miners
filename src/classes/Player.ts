@@ -113,4 +113,37 @@ export class Player {
   getHandSize(): number {
     return this._hand.length;
   }
+
+  /**
+   * Serialize the player instance to a plain JSON object
+   */
+  toJSON() {
+    return {
+      id: this.id,
+      name: this.name,
+      avatar: this.avatar,
+      hand: this._hand.map(card => card.toJSON()),
+      statuses: [...this._statuses]
+    };
+  }
+
+  /**
+   * Create a new Player instance from a serialized JSON object
+   */
+  static fromJSON(json: {
+    id: number;
+    name: string;
+    avatar: string;
+    hand: ReturnType<Card['toJSON']>[];
+    statuses: PlayerStatus[];
+  }): Player {
+    const player = new Player(json.id, json.name, json.avatar);
+    json.hand.forEach(cardJson => {
+      player.addCard(Card.fromJSON(cardJson));
+    });
+    json.statuses.forEach(status => {
+      player._statuses.push(status);
+    });
+    return player;
+  }
 }

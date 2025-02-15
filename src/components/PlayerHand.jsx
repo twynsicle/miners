@@ -1,5 +1,6 @@
 import React from 'react';
-import Card from './Card';
+import { useSelector } from 'react-redux';
+import CardDisplay from './CardDisplay';
 import '../styles/PlayerHand.css';
 
 /**
@@ -23,11 +24,9 @@ const PlayerHand = ({ cards, selectedCard, onCardSelect, onCardDragStart, player
             key={`hand-${index}-${card.id || 'unknown'}`}
             className={`hand-card ${card === selectedCard ? 'selected' : ''}`}
           >
-            <Card
-              {...card}
-              selected={card === selectedCard}
-              onClick={() => onCardSelect(index)}
-              onDragStart={() => onCardDragStart(card)}
+            <CardDisplay
+              card={card}
+              isDraggable={true}
             />
           </div>
         ))}

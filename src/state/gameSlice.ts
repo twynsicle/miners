@@ -2,8 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Card } from '../classes/Card';
 import { Deck } from '../classes/Deck';
 import { Player } from '../classes/Player';
-import { PathsType } from '../types/game';
-import { BOARD_SIZE, SPECIAL_CARDS } from '../constants/gameConstants';
+import { SPECIAL_CARDS } from '../constants/gameConstants';
 import { DEFAULT_PLAYERS } from '../constants/playerConstants';
 
 interface GameState {
@@ -12,16 +11,16 @@ interface GameState {
   activePlayerId: number;
   selectedCard: Card | null;
   draggedCard: Card | null;
-  deck: Card[];
+  deck: Deck;
   cardsRemaining: number;
 }
 
 const createStartCard = (): Card => {
-  return new Card([[0, 1, 2, 3]], 'start', SPECIAL_CARDS.START, 'start');
+  return new Card([[0, 1, 2, 3]], 'start', SPECIAL_CARDS.START);
 };
 
 const createDestinationCard = (id: string): Card => {
-  return new Card([[0, 1, 2, 3]], 'dest', `${SPECIAL_CARDS.DEST_PREFIX}${id}`, id);
+  return new Card([[0, 1, 2, 3]], 'dest', `${SPECIAL_CARDS.DEST_PREFIX}${id}`);
 };
 
 const createInitialState = (): GameState => {
@@ -52,14 +51,16 @@ const createInitialState = (): GameState => {
     '1,6': createDestinationCard('3')
   };
 
+  // Convert deck to serializable format
+  
   return {
     board,
-    players,
+    players: players,
     activePlayerId: 1,
     selectedCard: null,
     draggedCard: null,
-    deck: deck.cards,
-    cardsRemaining: deck.getCardsRemaining()
+    deck: deck,
+    cardsRemaining: deck.size()
   };
 };
 
@@ -88,15 +89,15 @@ export const gameSlice = createSlice({
       // Remove the card from player's hand
       const activePlayer = state.players.find(p => p.id === state.activePlayerId);
       if (activePlayer) {
-        activePlayer.removeCard(card.cardId);
+        activePlayer.removeCard(card.id);
         
         // Draw a new card if there are cards remaining
-        if (state.deck.length > 0) {
-          const newCard = state.deck.pop();
+        if (state.deck.size() > 0) {
+          const newCard = state.deck.drawCard();
           if (newCard) {
             activePlayer.addCard(newCard);
           }
-          state.cardsRemaining = state.deck.length;
+          state.cardsRemaining = state.deck.size();
         }
       }
 
