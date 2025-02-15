@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useDrop } from 'react-dnd';
 import BoardCell from './BoardCell';
 import PlayerHand from './PlayerHand';
 import DeckDisplay from './DeckDisplay';
@@ -9,20 +10,26 @@ import { gameActions } from '../state/gameSlice';
 import { getValidPositions, isValidDropNew } from '../utils/gameUtils';
 import { Card, GameState, Player } from '../types/game';
 import { RootState } from '../state/store';
+import { 
+  selectBoardCards, 
+  selectDraggedCard, 
+  selectSelectedCard, 
+  selectCardsRemaining, 
+  selectActivePlayerId, 
+  selectAllPlayers 
+} from '../state/selectors';
 import '../styles/GameBoard.css';
 
 const GameBoard: React.FC = () => {
   const dispatch = useGameDispatch();
   const boardRef = useRef<HTMLDivElement>(null);
 
-  const {
-    board,
-    players,
-    activePlayerId,
-    selectedCard,
-    draggedCard,
-    cardsRemaining,
-  } = useSelector((state: RootState) => state.game);
+  const boardCards = useSelector(selectBoardCards);
+  const selectedCard = useSelector(selectSelectedCard);
+  const draggedCard = useSelector(selectDraggedCard);
+  const cardsRemaining = useSelector(selectCardsRemaining);
+  const activePlayerId = useSelector(selectActivePlayerId);
+  const players = useSelector(selectAllPlayers);
 
   const activePlayer = players.find(p => p.id === activePlayerId);
 
@@ -53,14 +60,15 @@ const GameBoard: React.FC = () => {
     
     // Convert board object to array format for validation
     const boardArray = new Array(9 * 9).fill(null);
-    Object.entries(board).forEach(([pos, card]) => {
+    Object.entries(boardCards).forEach(([pos, card]) => {
       const [r, c] = pos.split(',').map(Number);
       boardArray[r * 9 + c] = card;
     });
     
     if ((selectedCard || draggedCard) && isValidDropNew(boardArray, row * 9 + col, selectedCard || draggedCard)) {
       console.log(' Placing card via click:', { card: selectedCard || draggedCard });
-      dispatch(gameActions.placeCard({ position, card: selectedCard || draggedCard }));
+      const card = selectedCard || draggedCard;
+      dispatch(gameActions.placeCard({ position, cardId: card.id }));
     }
   };
 
@@ -73,14 +81,14 @@ const GameBoard: React.FC = () => {
     
     // Convert board object to array format for validation
     const boardArray = new Array(9 * 9).fill(null);
-    Object.entries(board).forEach(([pos, card]) => {
+    Object.entries(boardCards).forEach(([pos, card]) => {
       const [r, c] = pos.split(',').map(Number);
       boardArray[r * 9 + c] = card;
     });
     
     if (cardInHand && isValidDropNew(boardArray, row * 9 + col, cardInHand)) {
       console.log(' Placing card via drop', droppedCard);
-      dispatch(gameActions.placeCard({ position, card: cardInHand }));
+      dispatch(gameActions.placeCard({ position, cardId: cardInHand.id }));
     } else {
       console.log(' Drop rejected:', { 
         hasCard: !!cardInHand, 
@@ -91,7 +99,7 @@ const GameBoard: React.FC = () => {
 
   // Render board grid
   const renderBoard = () => {
-    const validPositions = getValidPositions(selectedCard || draggedCard, board);
+    const validPositions = getValidPositions(selectedCard || draggedCard, boardCards);
     const rows = [];
 
     for (let row = 0; row < 9; row++) {
@@ -103,7 +111,7 @@ const GameBoard: React.FC = () => {
           <BoardCell
             key={position}
             positionId={positionId}
-            card={board[position] || null}
+            card={boardCards[position] || null}
             isValidPlacement={validPositions.has(position)}
             onClick={() => handleBoardClick(row, col)}
             onDrop={(droppedCard) => handleCellDrop(row, col, droppedCard)}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import CardDisplay from './CardDisplay';
+import { selectActivePlayer, selectSelectedCard } from '../state/selectors';
 import '../styles/PlayerHand.css';
 
 /**
@@ -12,17 +13,22 @@ import '../styles/PlayerHand.css';
  * @param {function(Object): void} props.onCardDragStart - Handler for card drag start
  * @param {string} props.playerName - Name of the player
  */
-const PlayerHand = ({ cards, selectedCard, onCardSelect, onCardDragStart, playerName }) => {
+const PlayerHand = () => {
+  const activePlayer = useSelector(selectActivePlayer);
+  const selectedCard = useSelector(selectSelectedCard);
+
+  if (!activePlayer) return null;
+
   return (
     <div className="player-hand-container">
       <div className="player-name">
-        {playerName}'s Hand
+        {activePlayer.name}'s Hand
       </div>
       <div className="cards-container">
-        {cards.map((card, index) => card && (
+        {activePlayer.hand.map((card) => (
           <div 
-            key={`hand-${index}-${card.id || 'unknown'}`}
-            className={`hand-card ${card === selectedCard ? 'selected' : ''}`}
+            key={`hand-${card.id}`}
+            className={`hand-card ${card.id === selectedCard?.id ? 'selected' : ''}`}
           >
             <CardDisplay
               card={card}

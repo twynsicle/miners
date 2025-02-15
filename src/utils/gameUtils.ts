@@ -74,9 +74,13 @@ export function pathsMatch(card1: Card, card2: Card, direction: number): boolean
   
   const oppositeDirection = getOppositeDirection(direction);
   
+  // Parse paths if they are strings
+  const paths1 = typeof card1.paths === 'string' ? JSON.parse(card1.paths) : card1.paths;
+  const paths2 = typeof card2.paths === 'string' ? JSON.parse(card2.paths) : card2.paths;
+  
   // Check if both cards have paths in the connecting directions
-  const card1HasPath = card1.paths.some(path => path.includes(direction));
-  const card2HasPath = card2.paths.some(path => path.includes(oppositeDirection));
+  const card1HasPath = paths1.some((path: number[]) => path.includes(direction));
+  const card2HasPath = paths2.some((path: number[]) => path.includes(oppositeDirection));
   
   // Both cards must have connecting paths
   return card1HasPath && card2HasPath;

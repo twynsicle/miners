@@ -2,9 +2,11 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import PlayerAvatar from './PlayerAvatar';
 import '../styles/PlayerList.css';
+import { selectAllPlayers, selectActivePlayer } from '../state/selectors';
 
 const PlayerList = () => {
-  const { players, activePlayerId } = useSelector(state => state.game);
+  const players = useSelector(selectAllPlayers);
+  const activePlayer = useSelector(selectActivePlayer);
 
   return (
     <div className="player-list">
@@ -12,18 +14,18 @@ const PlayerList = () => {
       {players.map(player => (
         <div 
           key={player.id} 
-          className={`player-card ${player.id === activePlayerId ? 'active' : ''}`}
+          className={`player-card ${player.id === activePlayer?.id ? 'active' : ''}`}
         >
           <PlayerAvatar 
             avatarUrl={player.avatar}
             playerName={player.name}
             size="medium"
-            isActive={player.id === activePlayerId}
+            isActive={player.id === activePlayer?.id}
           />
           <div className="player-info">
             <div className="player-name-row">
               <span className="player-name">{player.name}</span>
-              {player.id === activePlayerId && (
+              {player.id === activePlayer?.id && (
                 <span className="active-indicator">●</span>
               )}
             </div>
