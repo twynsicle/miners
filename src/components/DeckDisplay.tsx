@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/Deck.css';
+import '../styles/DeckDisplay.css';
 
 interface DeckDisplayProps {
   cardsRemaining: number;
