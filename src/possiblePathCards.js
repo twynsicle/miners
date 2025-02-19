@@ -1,5 +1,5 @@
 // Card configurations with their counts in the deck
-export const possibleCards = [
+export const possiblePathCards = [
   // Single dead ends
   { paths: [[0]], count: 2 },
   { paths: [[2]], count: 2 },

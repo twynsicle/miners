@@ -30,5 +30,7 @@
 }
 
 .hand-card.selected {
-  transform: translateY(-10px);
+  transform: translateY(-15px);
+  border: 2px solid var(--accent-success);
+  border-radius: var( --cell-border-radius);
 }

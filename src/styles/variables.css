@@ -3,7 +3,7 @@
   --bg-primary: #1a1a1a;
   --bg-secondary: #2a2a2a;
   --bg-elevated: #333;
-  --bg-card: #3a3a3a;
+  --bg-card: #4a4a4a;
 
   /* Text colors */
   --text-primary: #cac9c9;
@@ -22,5 +22,6 @@
   /* Dimensions */
   --card-width: 80px;
   --card-height: 60px;
-  --cell-border-radius: 5px;
+  /* TODO Border shouldn't be part of the cards image*/
+  --cell-border-radius: 10px;
 }

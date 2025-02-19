@@ -7,9 +7,11 @@ import { DEFAULT_PLAYERS } from '@/constants/playerConstants';
 import { CardType } from '@/types';
 
 export interface SerializedCard {
-  paths: string;
+  paths?: string;
   type: CardType;
   id: string;
+  text?: string;
+  color?: string;
 }
 
 export interface SerializedPlayer {
@@ -42,11 +44,11 @@ interface NormalizedGameState {
 }
 
 const createStartCard = (): Card => {
-  return new Card([[0, 1, 2, 3]], 'start', SPECIAL_CARDS.START);
+  return new Card('start', SPECIAL_CARDS.START, [[0, 1, 2, 3]]);
 };
 
 const createDestinationCard = (id: string): Card => {
-  return new Card([[0, 1, 2, 3]], 'dest', `${SPECIAL_CARDS.DEST_PREFIX}${id}`);
+  return new Card('dest', `${SPECIAL_CARDS.DEST_PREFIX}${id}`, [[0, 1, 2, 3]]);
 };
 
 const createInitialState = (): NormalizedGameState => {
@@ -80,8 +82,7 @@ const createInitialState = (): NormalizedGameState => {
   DEFAULT_PLAYERS.forEach((config) => {
     const handIds: string[] = [];
 
-    // Deal 5 cards to each player
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 6; i++) {
       const card = deck.drawCard();
       if (card) {
         cardsById[card.id] = card.toJSON();
@@ -131,46 +132,74 @@ const gameSlice = createSlice({
   name: 'game',
   initialState: createInitialState(),
   reducers: {
-    initGame: (state) => {
+    initGame(state) {
       const newState = createInitialState();
       Object.assign(state, newState);
     },
-    selectCard: (state, action: PayloadAction<string>) => {
+    selectCard(state, action: PayloadAction<string>) {
       state.selectedCardId = action.payload;
-      state.draggedCardId = null;
     },
-    dragCard: (state, action: PayloadAction<string>) => {
+    dragCard(state, action: PayloadAction<string>) {
       state.draggedCardId = action.payload;
-      state.selectedCardId = null;
     },
-    placeCard: (state, action: PayloadAction<{ position: string; cardId: string }>) => {
+    placeCard(state, action: PayloadAction<{ position: string; cardId: string }>) {
       const { position, cardId } = action.payload;
+      const card = state.cards.byId[cardId];
+      const player = state.players.byId[state.activePlayerId];
 
-      // Place card on board
-      state.board[position] = cardId;
-      state.selectedCardId = null;
-      state.draggedCardId = null;
-
-      // Find active player
-      const activePlayer = state.players.byId[state.activePlayerId];
-      if (activePlayer) {
+      // Only allow placing path cards on the board
+      if (card.type === 'path') {
         // Remove card from player's hand
-        activePlayer.handIds = activePlayer.handIds.filter((id) => id !== cardId);
+        player.handIds = player.handIds.filter((id) => id !== cardId);
+
+        // Place card on board
+        state.board[position] = cardId;
 
         // Draw a new card if available
         if (state.deck.cardIds.length > 0) {
-          const newCardId = state.deck.cardIds.pop()!;
-          activePlayer.handIds.push(newCardId);
-          state.cardsRemaining = state.deck.cardIds.length;
+          const newCardId = state.deck.cardIds[0];
+          player.handIds.push(newCardId);
+          state.deck.cardIds = state.deck.cardIds.slice(1);
         }
 
         // Move to next player
         const currentPlayerIndex = state.players.allIds.indexOf(state.activePlayerId);
-        const nextPlayerIndex = (currentPlayerIndex + 1) % state.players.allIds.length;
-        state.activePlayerId = state.players.allIds[nextPlayerIndex];
+        state.activePlayerId = state.players.allIds[(currentPlayerIndex + 1) % state.players.allIds.length];
+      }
+
+      // Clear selected/dragged card
+      state.selectedCardId = null;
+      state.draggedCardId = null;
+
+      // Update cards remaining count
+      state.cardsRemaining = state.deck.cardIds.length;
+    },
+    playActionCard(state, action: PayloadAction<string>) {
+      const cardId = action.payload;
+      const card = state.cards.byId[cardId];
+      const player = state.players.byId[state.activePlayerId];
+
+      // Only allow playing action cards
+      if (card.type === 'action') {
+        // Remove card from player's hand
+        player.handIds = player.handIds.filter((id) => id !== cardId);
+
+        // Draw a new card if available
+        if (state.deck.cardIds.length > 0) {
+          const newCardId = state.deck.cardIds[0];
+          player.handIds.push(newCardId);
+          state.deck.cardIds = state.deck.cardIds.slice(1);
+        }
+
+        // Move to next player
+        const currentPlayerIndex = state.players.allIds.indexOf(state.activePlayerId);
+        state.activePlayerId = state.players.allIds[(currentPlayerIndex + 1) % state.players.allIds.length];
+
+        // Update cards remaining count
+        state.cardsRemaining = state.deck.cardIds.length;
       }
     },
-    resetGame: (state) => {
+    resetGame(state) {
       const newState = createInitialState();
       Object.assign(state, newState);
     },

@@ -9,8 +9,8 @@ export const selectCards = (state: RootState) => state.game.cards;
 const createCardFromStored = (cardData: SerializedCard | undefined): Card | null => {
   if (!cardData) return null;
   // Parse paths before creating the Card
-  const paths = JSON.parse(cardData.paths);
-  return new Card(paths, cardData.type, cardData.id);
+  const paths = cardData.paths ? JSON.parse(cardData.paths) : null;
+  return new Card(cardData.type, cardData.id, paths);
 };
 
 export const selectAllPlayers = createSelector([selectGameState], (game) =>

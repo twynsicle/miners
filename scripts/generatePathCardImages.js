@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { possibleCards } from '../src/possibleCards.js';
+import { possiblePathCards } from '../src/possiblePathCards.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -202,7 +202,7 @@ if (!fs.existsSync(outputDir)) {
 }
 
 // Generate regular path cards
-possibleCards.forEach((card) => {
+possiblePathCards.forEach((card) => {
   const canvas = generateCardImage(card.paths);
   const filename = `card_${card.paths.map((path) => path.sort().join('')).join('_')}.png`;
   const buffer = canvas.toBuffer('image/png');
